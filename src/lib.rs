@@ -86,7 +86,7 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// Deprecated, use `is_multiple_of` instead.
     fn divides(&self, other: &Self) -> bool;
 
-    /// Returns `true` if `other` is a multiple of `self`.
+    /// Returns `true` if `self` is a multiple of `other`.
     ///
     /// # Examples
     ///
