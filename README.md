@@ -22,6 +22,20 @@ and this to your crate root:
 extern crate num_integer;
 ```
 
+## Features
+
+This crate can be used without the standard library (`#![no_std]`) by disabling
+the default `std` feature.  Use this in `Cargo.toml`:
+
+```toml
+[dependencies.num-integer]
+version = "0.1.36"
+default-features = false
+```
+
+There is no functional difference with and without `std` at this time, but
+there may be in the future.
+
 ## Compatibility
 
 The `num-integer` crate is tested for rustc 1.8 and greater.
