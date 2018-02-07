@@ -36,6 +36,10 @@ default-features = false
 There is no functional difference with and without `std` at this time, but
 there may be in the future.
 
+## Releases
+
+Release notes are available in [RELEASES.md](RELEASES.md).
+
 ## Compatibility
 
 The `num-integer` crate is tested for rustc 1.8 and greater.
