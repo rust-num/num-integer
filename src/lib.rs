@@ -9,12 +9,21 @@
 // except according to those terms.
 
 //! Integer trait and functions.
+//!
+//! ## Compatibility
+//!
+//! The `num-integer` crate is tested for rustc 1.8 and greater.
 
 #![doc(html_root_url = "https://docs.rs/num-integer/0.1")]
 
+#![cfg_attr(not(feature = "std"), no_std)]
+#[cfg(feature = "std")]
+extern crate core;
+
 extern crate num_traits as traits;
 
-use std::ops::Add;
+use core::ops::Add;
+use core::mem;
 
 use traits::{Num, Signed};
 
@@ -267,7 +276,7 @@ macro_rules! impl_integer_for_isize {
 
                 while m != 0 {
                     m >>= m.trailing_zeros();
-                    if n > m { ::std::mem::swap(&mut n, &mut m) }
+                    if n > m { mem::swap(&mut n, &mut m) }
                     m -= n;
                 }
 
@@ -312,6 +321,7 @@ macro_rules! impl_integer_for_isize {
         #[cfg(test)]
         mod $test_mod {
             use Integer;
+            use core::mem;
 
             /// Checks that the division rule holds for:
             ///
@@ -389,7 +399,7 @@ macro_rules! impl_integer_for_isize {
             fn test_gcd_cmp_with_euclidean() {
                 fn euclidean_gcd(mut m: $T, mut n: $T) -> $T {
                     while m != 0 {
-                        ::std::mem::swap(&mut m, &mut n);
+                        mem::swap(&mut m, &mut n);
                         m %= n;
                     }
 
@@ -526,7 +536,7 @@ macro_rules! impl_integer_for_usize {
 
                 while m != 0 {
                     m >>= m.trailing_zeros();
-                    if n > m { ::std::mem::swap(&mut n, &mut m) }
+                    if n > m { mem::swap(&mut n, &mut m) }
                     m -= n;
                 }
 
@@ -573,6 +583,7 @@ macro_rules! impl_integer_for_usize {
         #[cfg(test)]
         mod $test_mod {
             use Integer;
+            use core::mem;
 
             #[test]
             fn test_div_mod_floor() {
@@ -600,7 +611,7 @@ macro_rules! impl_integer_for_usize {
             fn test_gcd_cmp_with_euclidean() {
                 fn euclidean_gcd(mut m: $T, mut n: $T) -> $T {
                     while m != 0 {
-                        ::std::mem::swap(&mut m, &mut n);
+                        mem::swap(&mut m, &mut n);
                         m %= n;
                     }
                     n
@@ -817,9 +828,10 @@ fn test_iter_binomial() {
     macro_rules! check_simple {
         ($t:ty) => { {
             let n: $t = 3;
-            let c: Vec<_> = IterBinomial::new(n).collect();
-            let expected = vec![1, 3, 3, 1];
-            assert_eq!(c, expected);
+            let expected = [1, 3, 3, 1];
+            for (b, &e) in IterBinomial::new(n).zip(&expected) {
+                assert_eq!(b, e);
+            }
         } }
     }
 
@@ -835,9 +847,8 @@ fn test_iter_binomial() {
     macro_rules! check_binomial {
         ($t:ty, $n:expr) => { {
             let n: $t = $n;
-            let c: Vec<_> = IterBinomial::new(n).collect();
             let mut k: $t = 0;
-            for b in c {
+            for b in IterBinomial::new(n) {
                 assert_eq!(b, binomial(n, k));
                 k += 1;
             }
