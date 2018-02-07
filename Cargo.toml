@@ -17,4 +17,4 @@ default-features = false
 
 [features]
 default = ["std"]
-std = ["num-traits/std"]
+std = []
