@@ -2,7 +2,7 @@
 
 - [num-integer now has its own source repository][num-356] at [rust-num/num-integer][home].
 - [Corrected the argument order documented in `Integer::is_multiple_of`][1]
-- There is now a `std` feature, enabled by default, along with the implication
+- [There is now a `std` feature][5], enabled by default, along with the implication
   that building *without* this feature makes this a `#[no_std]` crate.
   - There is no difference in the API at this time.
 
@@ -11,6 +11,7 @@
 [home]: https://github.com/rust-num/num-integer
 [num-356]: https://github.com/rust-num/num/pull/356
 [1]: https://github.com/rust-num/num-integer/pull/1
+[5]: https://github.com/rust-num/num-integer/pull/5
 
 
 # Prior releases
