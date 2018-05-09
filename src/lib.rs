@@ -16,9 +16,9 @@
 
 #![doc(html_root_url = "https://docs.rs/num-integer/0.1")]
 
-#![cfg_attr(not(feature = "std"), no_std)]
+#![no_std]
 #[cfg(feature = "std")]
-extern crate core;
+extern crate std;
 
 extern crate num_traits as traits;
 
