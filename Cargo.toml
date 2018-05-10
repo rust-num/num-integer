@@ -15,9 +15,10 @@ readme = "README.md"
 all-features = true
 
 [dependencies.num-traits]
-version = "0.2.0"
+version = "0.2.3"
 default-features = false
 
 [features]
 default = ["std"]
-std = []
+i128 = ["num-traits/i128"]
+std = ["num-traits/std"]
