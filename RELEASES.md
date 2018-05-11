@@ -1,6 +1,6 @@
 # Release 0.1.38
 
-- [Support for 128-bit integers is now automatically detected and enabled.][69]
+- [Support for 128-bit integers is now automatically detected and enabled.][8]
   Setting the `i128` crate feature now causes the build script to panic if such
   support is not detected.
 
