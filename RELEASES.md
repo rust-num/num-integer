@@ -1,3 +1,13 @@
+# Release 0.1.38
+
+- [Support for 128-bit integers is now automatically detected and enabled.][69]
+  Setting the `i128` crate feature now causes the build script to panic if such
+  support is not detected.
+
+**Contributors**: @cuviper
+
+[8]: https://github.com/rust-num/num-integer/pull/8
+
 # Release 0.1.37
 
 - [`Integer` is now implemented for `i128` and `u128`][7] starting with Rust

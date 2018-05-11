@@ -8,14 +8,15 @@ categories = ["algorithms", "science", "no-std"]
 license = "MIT/Apache-2.0"
 repository = "https://github.com/rust-num/num-integer"
 name = "num-integer"
-version = "0.1.37"
+version = "0.1.38"
 readme = "README.md"
+build = "build.rs"
 
 [package.metadata.docs.rs]
-all-features = true
+features = ["std"]
 
 [dependencies.num-traits]
-version = "0.2.3"
+version = "0.2.4"
 default-features = false
 
 [features]
