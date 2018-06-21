@@ -27,6 +27,10 @@ use core::mem;
 
 use traits::{Num, Signed};
 
+mod roots;
+pub use roots::Roots;
+pub use roots::{sqrt, cbrt, nth_root};
+
 pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// Floored integer division.
     ///
