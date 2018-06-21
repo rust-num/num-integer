@@ -1,3 +1,12 @@
+# Release 0.1.39
+
+- [The new `Roots` trait provides `sqrt`, `cbrt`, and `nth_root` methods][9],
+  calculating an `Integer`'s principal roots rounded toward zero.
+
+**Contributors**: @cuviper
+
+[9]: https://github.com/rust-num/num-integer/pull/9
+
 # Release 0.1.38
 
 - [Support for 128-bit integers is now automatically detected and enabled.][8]
