@@ -22,7 +22,7 @@ extern crate std;
 extern crate num_traits as traits;
 
 use core::mem;
-use core::ops::Add;
+use core::ops::{Add, Neg, Shr};
 use core::cmp::Ordering;
 
 use traits::{Num, NumRef, RefNum, Signed, Zero};
@@ -1064,6 +1064,30 @@ pub fn inverse<T: Integer + NumRef + Clone>(a: T, n: &T) -> Option<T>
     }
 }
 
+/// Calculate base^exp (mod modulus).
+pub fn powm<T>(base: &T, exp: &T, modulus: &T) -> T
+    where T: Integer + NumRef + Clone + Neg<Output = T> + Shr<i32, Output = T>,
+          for<'a> &'a T: RefNum<T>
+{
+    let zero = T::zero();
+    let one = T::one();
+    let two = &one + &one;
+    let mut exp = exp.clone();
+    let mut result = one.clone();
+    let mut base = base % modulus;
+    if exp < zero {
+        exp = -exp;
+        base = inverse(base, modulus).unwrap();
+    }
+    while exp > zero {
+        if &exp % &two == one {
+            result = (result * &base) % modulus;
+        }
+        exp = exp >> 1;
+        base = (&base * &base) % modulus;
+    }
+    result
+}
 
 /// An iterator over binomial coefficients.
 pub struct IterBinomial<T> {
@@ -1237,6 +1261,12 @@ fn test_normalize() {
 #[test]
 fn test_inverse() {
     assert_eq!(inverse(5, &7).unwrap(), 3);
+}
+
+#[test]
+fn test_powm() {
+    // `i64::pow` would overflow.
+    assert_eq!(powm(&11, &19, &7), 4);
 }
 
 #[test]
