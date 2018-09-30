@@ -23,7 +23,6 @@ extern crate std;
 extern crate num_traits as traits;
 
 use core::ops::Add;
-use core::mem;
 
 use traits::{Num, Signed};
 
@@ -275,16 +274,20 @@ macro_rules! impl_integer_for_isize {
                 n = n.abs();
 
                 // divide n and m by 2 until odd
-                // m inside loop
                 n >>= n.trailing_zeros();
+                m >>= m.trailing_zeros();
 
-                while m != 0 {
-                    m >>= m.trailing_zeros();
-                    if n > m { mem::swap(&mut n, &mut m) }
-                    m -= n;
+                loop {
+                    if m > n {
+                        m -= n;
+                        if m == 0 { return n << shift; }
+                        m >>= m.trailing_zeros();
+                    } else {
+                        n -= m;
+                        if n == 0 { return m << shift; }
+                        n >>= n.trailing_zeros();
+                    }
                 }
-
-                n << shift
             }
 
             /// Calculates the Lowest Common Multiple (LCM) of the number and
@@ -537,16 +540,20 @@ macro_rules! impl_integer_for_usize {
                 let shift = (m | n).trailing_zeros();
 
                 // divide n and m by 2 until odd
-                // m inside loop
                 n >>= n.trailing_zeros();
+                m >>= m.trailing_zeros();
 
-                while m != 0 {
-                    m >>= m.trailing_zeros();
-                    if n > m { mem::swap(&mut n, &mut m) }
-                    m -= n;
+                loop {
+                    if m > n {
+                        m -= n;
+                        if m == 0 { return n << shift; }
+                        m >>= m.trailing_zeros();
+                    } else {
+                        n -= m;
+                        if n == 0 { return m << shift; }
+                        n >>= n.trailing_zeros();
+                    }
                 }
-
-                n << shift
             }
 
             /// Calculates the Lowest Common Multiple (LCM) of the number and `other`.
