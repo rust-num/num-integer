@@ -274,20 +274,19 @@ macro_rules! impl_integer_for_isize {
                 n = n.abs();
 
                 // divide n and m by 2 until odd
-                n >>= n.trailing_zeros();
                 m >>= m.trailing_zeros();
+                n >>= n.trailing_zeros();
 
-                loop {
+                while m != n {
                     if m > n {
                         m -= n;
-                        if m == 0 { return n << shift; }
                         m >>= m.trailing_zeros();
                     } else {
                         n -= m;
-                        if n == 0 { return m << shift; }
                         n >>= n.trailing_zeros();
                     }
                 }
+                m << shift
             }
 
             /// Calculates the Lowest Common Multiple (LCM) of the number and
@@ -540,20 +539,19 @@ macro_rules! impl_integer_for_usize {
                 let shift = (m | n).trailing_zeros();
 
                 // divide n and m by 2 until odd
-                n >>= n.trailing_zeros();
                 m >>= m.trailing_zeros();
+                n >>= n.trailing_zeros();
 
-                loop {
+                while m != n {
                     if m > n {
                         m -= n;
-                        if m == 0 { return n << shift; }
                         m >>= m.trailing_zeros();
                     } else {
                         n -= m;
-                        if n == 0 { return m << shift; }
                         n >>= n.trailing_zeros();
                     }
                 }
+                m << shift
             }
 
             /// Calculates the Lowest Common Multiple (LCM) of the number and `other`.
