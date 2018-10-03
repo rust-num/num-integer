@@ -23,7 +23,6 @@ extern crate std;
 extern crate num_traits as traits;
 
 use core::ops::Add;
-use core::mem;
 
 use traits::{Num, Signed};
 
@@ -275,16 +274,19 @@ macro_rules! impl_integer_for_isize {
                 n = n.abs();
 
                 // divide n and m by 2 until odd
-                // m inside loop
+                m >>= m.trailing_zeros();
                 n >>= n.trailing_zeros();
 
-                while m != 0 {
-                    m >>= m.trailing_zeros();
-                    if n > m { mem::swap(&mut n, &mut m) }
-                    m -= n;
+                while m != n {
+                    if m > n {
+                        m -= n;
+                        m >>= m.trailing_zeros();
+                    } else {
+                        n -= m;
+                        n >>= n.trailing_zeros();
+                    }
                 }
-
-                n << shift
+                m << shift
             }
 
             /// Calculates the Lowest Common Multiple (LCM) of the number and
@@ -537,16 +539,19 @@ macro_rules! impl_integer_for_usize {
                 let shift = (m | n).trailing_zeros();
 
                 // divide n and m by 2 until odd
-                // m inside loop
+                m >>= m.trailing_zeros();
                 n >>= n.trailing_zeros();
 
-                while m != 0 {
-                    m >>= m.trailing_zeros();
-                    if n > m { mem::swap(&mut n, &mut m) }
-                    m -= n;
+                while m != n {
+                    if m > n {
+                        m -= n;
+                        m >>= m.trailing_zeros();
+                    } else {
+                        n -= m;
+                        n >>= n.trailing_zeros();
+                    }
                 }
-
-                n << shift
+                m << shift
             }
 
             /// Calculates the Lowest Common Multiple (LCM) of the number and `other`.
