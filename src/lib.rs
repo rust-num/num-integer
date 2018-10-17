@@ -95,6 +95,21 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// ~~~
     fn lcm(&self, other: &Self) -> Self;
 
+    /// Greatest Common Divisor (GCD) and
+    /// Lowest Common Multiple (LCM) simultaneously.
+    ///
+    /// More efficient than calling `gcd` and `lcm`
+    /// individually for identical inputs.
+    /// 
+    /// # Examples
+    ///
+    /// ~~~
+    /// # use num_integer::Integer;
+    /// assert_eq!(10.gcd_lcm(&4), (2, 20));
+    /// assert_eq!(8.gcd_lcm(&9), (1, 72));
+    /// ~~~
+    fn gcd_lcm(&self, other: &Self) -> (Self, Self);
+
     /// Deprecated, use `is_multiple_of` instead.
     fn divides(&self, other: &Self) -> bool;
 
@@ -206,6 +221,13 @@ pub fn lcm<T: Integer>(x: T, y: T) -> T {
     x.lcm(&y)
 }
 
+/// Calculates the Greatest Common Divisor (GCD) and
+/// Lowest Common Multiple (LCM) of the number and `other`.
+#[inline(always)]
+pub fn gcd_lcm<T: Integer>(x: T, y: T) -> (T, T) {
+    x.gcd_lcm(&y)
+}
+
 macro_rules! impl_integer_for_isize {
     ($T:ty, $test_mod:ident) => (
         impl Integer for $T {
@@ -295,6 +317,16 @@ macro_rules! impl_integer_for_isize {
             fn lcm(&self, other: &Self) -> Self {
                 // should not have to recalculate abs
                 (*self * (*other / self.gcd(other))).abs()
+            }
+
+            /// Calculates the Greatest Common Divisor (GCD) and 
+            /// Lowest Common Multiple (LCM) of the number and `other`.
+            #[inline]
+            fn gcd_lcm(&self, other: &Self) -> (Self, Self) {
+                let gcd = self.gcd(other);
+                // should not have to recalculate abs
+                let lcm = (*self * (*other / gcd)).abs();
+                (gcd, lcm)
             }
 
             /// Deprecated, use `is_multiple_of` instead.
@@ -476,6 +508,15 @@ macro_rules! impl_integer_for_isize {
             }
 
             #[test]
+            fn test_gcd_lcm() {
+                for i in 1..=255 {
+                    for j in 0..=255 {
+                        assert_eq!(i.gcd_lcm(&j), (i.gcd(&j), i.lcm(&j)));
+                    }
+                }
+            }
+
+            #[test]
             fn test_even() {
                 assert_eq!((-4 as $T).is_even(), true);
                 assert_eq!((-3 as $T).is_even(), false);
@@ -558,6 +599,15 @@ macro_rules! impl_integer_for_usize {
             #[inline]
             fn lcm(&self, other: &Self) -> Self {
                 *self * (*other / self.gcd(other))
+            }
+
+            /// Calculates the Greatest Common Divisor (GCD) and 
+            /// Lowest Common Multiple (LCM) of the number and `other`.
+            #[inline]
+            fn gcd_lcm(&self, other: &Self) -> (Self, Self) {
+                let gcd = self.gcd(other);
+                let lcm = *self * (*other / gcd);
+                (gcd, lcm)
             }
 
             /// Deprecated, use `is_multiple_of` instead.
@@ -651,6 +701,15 @@ macro_rules! impl_integer_for_usize {
                 assert_eq!((8 as $T).lcm(&9), 72 as $T);
                 assert_eq!((11 as $T).lcm(&5), 55 as $T);
                 assert_eq!((15 as $T).lcm(&17), 255 as $T);
+            }
+
+            #[test]
+            fn test_gcd_lcm() {
+                for i in 1..=255 {
+                    for j in 0..=255 {
+                        assert_eq!(i.gcd_lcm(&j), (i.gcd(&j), i.lcm(&j)));
+                    }
+                }
             }
 
             #[test]
