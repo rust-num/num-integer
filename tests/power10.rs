@@ -74,13 +74,11 @@ macro_rules! unsigned_power10 {
                 assert_eq!(<$T>::max_value().wrapping_next_power_of_ten(), 0);
                 assert_eq!(
                     (<$T>::max_value() - 1).wrapping_next_power_of_ten(),
-                    0,
-                    "max - 1"
+                    0
                 );
                 assert_eq!(
                     (<$T>::max_value() - 2).wrapping_next_power_of_ten(),
-                    0,
-                    "max - 2"
+                    0
                 );
                 let mut x: $T = 1;
                 let end: $T = <$T>::max_value() / 10;
