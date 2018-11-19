@@ -6,7 +6,7 @@ use num_traits::ToPrimitive;
 
 fn log10_compare_with_f64<T: Power10 + ToPrimitive>(x: T) {
     let expected = x.to_f64().unwrap().log10().floor() as u32;
-    assert_eq!(x.floor_log10(), expected, "{}", x.to_f64().unwrap());
+    assert_eq!(x.floor_log10(), expected); //, "{}", x.to_f64().unwrap()
 }
 
 macro_rules! unsigned_power10 {
@@ -38,7 +38,7 @@ macro_rules! unsigned_power10 {
 
             #[test]
             fn test_floor_log10() {
-                assert_eq!((0 as $T).floor_log10(), 0, "zero");
+                assert_eq!((0 as $T).floor_log10(), 0);
                 log10_compare_with_f64(<$T>::max_value());
                 log10_compare_with_f64(<$T>::max_value() - 1);
                 log10_compare_with_f64(<$T>::max_value() - 2);
@@ -46,17 +46,17 @@ macro_rules! unsigned_power10 {
                 let mut count: u32 = 0;
                 let end: $T = <$T>::max_value() / 10;
                 while x < end {
-                    assert_eq!(floor_log10(x), count, "{}", x);
+                    assert_eq!(floor_log10(x), count);
                     if x > 1 {
-                        assert_eq!((x - 1).floor_log10(), count - 1, "{}", x - 1);
+                        assert_eq!((x - 1).floor_log10(), count - 1);
                     }
-                    assert_eq!((x + 1).floor_log10(), count, "{}", x + 1);
+                    assert_eq!((x + 1).floor_log10(), count);
                     x *= 10;
                     count += 1;
                 }
-                assert_eq!(x.floor_log10(), count, "{}", x);
-                assert_eq!((x - 1).floor_log10(), count - 1, "{}", (x - 1));
-                assert_eq!((x + 1).floor_log10(), count, "{}", (x + 1));
+                assert_eq!(x.floor_log10(), count);
+                assert_eq!((x - 1).floor_log10(), count - 1);
+                assert_eq!((x + 1).floor_log10(), count);
 
                 //powers of 2
                 x = 1;
@@ -70,8 +70,8 @@ macro_rules! unsigned_power10 {
 
             #[test]
             fn test_wrap_next_power_10() {
-                assert_eq!((0 as $T).wrapping_next_power_of_ten(), 1, "zero");
-                assert_eq!(<$T>::max_value().wrapping_next_power_of_ten(), 0, "max");
+                assert_eq!((0 as $T).wrapping_next_power_of_ten(), 1);
+                assert_eq!(<$T>::max_value().wrapping_next_power_of_ten(), 0);
                 assert_eq!(
                     (<$T>::max_value() - 1).wrapping_next_power_of_ten(),
                     0,
@@ -85,24 +85,24 @@ macro_rules! unsigned_power10 {
                 let mut x: $T = 1;
                 let end: $T = <$T>::max_value() / 10;
                 while x < end {
-                    assert_eq!(wrapping_next_power_of_ten(x), x, "{}", x);
+                    assert_eq!(wrapping_next_power_of_ten(x), x);
                     if x > 1 {
-                        assert_eq!((x - 1).wrapping_next_power_of_ten(), x, "{}", x);
+                        assert_eq!((x - 1).wrapping_next_power_of_ten(), x);
                     }
-                    assert_eq!((x + 1).wrapping_next_power_of_ten(), x * 10, "{}", x + 1);
+                    assert_eq!((x + 1).wrapping_next_power_of_ten(), x * 10);
                     x *= 10;
                 }
-                assert_eq!(x.wrapping_next_power_of_ten(), x, "{}", x);
-                assert_eq!((x - 1).wrapping_next_power_of_ten(), x, "{}", (x - 1));
-                assert_eq!((x + 1).wrapping_next_power_of_ten(), 0, "{}", (x + 1));
+                assert_eq!(x.wrapping_next_power_of_ten(), x);
+                assert_eq!((x - 1).wrapping_next_power_of_ten(), x);
+                assert_eq!((x + 1).wrapping_next_power_of_ten(), 0);
         
                 //powers of 2
                 x = 4;
                 let mut pow10 = 10;
                 while x != 0 {
-                    assert_eq!(x.wrapping_next_power_of_ten(), pow10, "{}", x);
-                    assert_eq!((x + 1).wrapping_next_power_of_ten(), pow10, "{}", x + 1);
-                    assert_eq!((x - 1).wrapping_next_power_of_ten(), pow10, "{}", x - 1);
+                    assert_eq!(x.wrapping_next_power_of_ten(), pow10);
+                    assert_eq!((x + 1).wrapping_next_power_of_ten(), pow10);
+                    assert_eq!((x - 1).wrapping_next_power_of_ten(), pow10);
                     x <<= 1;
                     if x > pow10 {
                         if pow10 > end {
@@ -117,56 +117,52 @@ macro_rules! unsigned_power10 {
             #[test]
             #[should_panic]
             fn test_next_power_10_panic1() {
-                assert_eq!(<$T>::max_value().next_power_of_ten(), 0, "max");
+                assert_eq!(<$T>::max_value().next_power_of_ten(), 0);
             }
         
             #[test]
             #[should_panic]
             fn test_next_power_10_panic2() {
-                assert_eq!((<$T>::max_value() - 1).next_power_of_ten(), 0, "max - 1");
+                assert_eq!((<$T>::max_value() - 1).next_power_of_ten(), 0);
             }
         
             #[test]
             fn test_checked_next_power_10() {
-                assert_eq!((0 as $T).checked_next_power_of_ten(), Some(1), "zero");
-                assert_eq!(<$T>::max_value().checked_next_power_of_ten(), None, "max");
+                assert_eq!((0 as $T).checked_next_power_of_ten(), Some(1));
+                assert_eq!(<$T>::max_value().checked_next_power_of_ten(), None);
                 assert_eq!(
                     (<$T>::max_value() - 1).checked_next_power_of_ten(),
-                    None,
-                    "max - 1"
+                    None
                 );
                 assert_eq!(
                     (<$T>::max_value() - 2).checked_next_power_of_ten(),
-                    None,
-                    "max - 2"
+                    None
                 );
                 let mut x: $T = 1;
                 let end: $T = <$T>::max_value() / 10;
                 while x < end {
-                    assert_eq!(checked_next_power_of_ten(x), Some(x), "{}", x);
+                    assert_eq!(checked_next_power_of_ten(x), Some(x));
                     if x > 1 {
-                        assert_eq!((x - 1).checked_next_power_of_ten(), Some(x), "{}", x);
+                        assert_eq!((x - 1).checked_next_power_of_ten(), Some(x));
                     }
                     assert_eq!(
                         (x + 1).checked_next_power_of_ten(),
-                        Some(x * 10),
-                        "{}",
-                        x + 1
+                        Some(x * 10)
                     );
                     x *= 10;
                 }
-                assert_eq!(x.checked_next_power_of_ten(), Some(x), "{}", x);
-                assert_eq!((x - 1).checked_next_power_of_ten(), Some(x), "{}", (x - 1));
-                assert_eq!((x + 1).checked_next_power_of_ten(), None, "{}", (x + 1));
+                assert_eq!(x.checked_next_power_of_ten(), Some(x));
+                assert_eq!((x - 1).checked_next_power_of_ten(), Some(x));
+                assert_eq!((x + 1).checked_next_power_of_ten(), None);
         
                 //powers of 2
                 x = 4;
                 let mut pow10 = 10;
                 while x != 0 {
                     let c = if pow10 == 0 { None } else { Some(pow10) };
-                    assert_eq!(x.checked_next_power_of_ten(), c, "{}", x);
-                    assert_eq!((x + 1).checked_next_power_of_ten(), c, "{}", x + 1);
-                    assert_eq!((x - 1).checked_next_power_of_ten(), c, "{}", x - 1);
+                    assert_eq!(x.checked_next_power_of_ten(), c);
+                    assert_eq!((x + 1).checked_next_power_of_ten(), c);
+                    assert_eq!((x - 1).checked_next_power_of_ten(), c);
                     x <<= 1;
                     if x > pow10 {
                         if pow10 > end {
