@@ -4,7 +4,7 @@ extern crate num_integer;
 extern crate num_traits;
 extern crate test;
 
-use num_integer::floor_log10;
+use num_integer::log10;
 use num_integer::is_power_of_ten;
 use num_integer::Power10;
 use num_traits::One;
@@ -15,25 +15,25 @@ use test::{black_box, Bencher};
 #[bench]
 fn benchl10_u32_only_powers_of_ten(b: &mut Bencher) {
     let v = powers_10_vec::<u32>();
-    bench_log10_slice(b, &v, floor_log10);
+    bench_log10_slice(b, &v, log10);
 }
 
 #[bench]
 fn benchl10_u32_up_to_10000(b: &mut Bencher) {
     let v = first_10000_vec::<u32>();
-    bench_log10_slice(b, &v, floor_log10);
+    bench_log10_slice(b, &v, log10);
 }
 
 #[bench]
 fn benchl10_u64_only_powers_of_ten(b: &mut Bencher) {
     let v = powers_10_vec::<u64>();
-    bench_log10_slice(b, &v, floor_log10);
+    bench_log10_slice(b, &v, log10);
 }
 
 #[bench]
 fn benchl10_u64_up_to_10000(b: &mut Bencher) {
     let v = first_10000_vec::<u64>();
-    bench_log10_slice(b, &v, floor_log10);
+    bench_log10_slice(b, &v, log10);
 }
 
 #[bench]

@@ -14,16 +14,41 @@ pub trait Power10: Integer {
     fn is_power_of_ten(&self) -> bool;
 
     /// Returns the base 10 logarithm value, truncated down.
-    /// Returns zero for zero.
+    /// Returns zero for zero in release mode, panics in debug mode.
     ///
     /// # Examples
     ///
     /// ~~~
     /// use num_integer::Power10;
-    /// assert_eq!(100u32.floor_log10(), 2);
-    /// assert_eq!(4u32.floor_log10(), 0);
+    /// assert_eq!(100u32.log10(), 2);
+    /// assert_eq!(4u32.log10(), 0);
     /// ~~~
-    fn floor_log10(&self) -> u32; //note: u32 return type to allow BigInt types to implement. 10^(2^32) is 4 billion digits
+    fn log10(&self) -> u32; //note: u32 return type to allow BigInt types to implement. 10^(2^32) is 4 billion digits
+
+    /// Returns the base 10 logarithm value, truncated down.
+    /// Panics for zero.
+    ///
+    /// # Examples
+    ///
+    /// ~~~
+    /// use num_integer::Power10;
+    /// assert_eq!(100u32.checked_log10(), 2);
+    /// assert_eq!(4u32.checked_log10(), 0);
+    /// ~~~
+    fn checked_log10(&self) -> u32;
+
+    /// Returns the base 10 logarithm value, truncated down.
+    /// Returns zero for zero. (This matches f64::log10()::floor() for zero.)
+    ///
+    /// # Examples
+    ///
+    /// ~~~
+    /// use num_integer::Power10;
+    /// assert_eq!(100u32.unchecked_log10(), 2);
+    /// assert_eq!(4u32.unchecked_log10(), 0);
+    /// assert_eq!(0u32.unchecked_log10(), 0);
+    /// ~~~
+    fn unchecked_log10(&self) -> u32;
 
     /// Returns a power of ten greater than or equal to the supplied value.
     /// If the next power of ten is larger than `max_value()`, 0 is returned.
@@ -74,8 +99,20 @@ pub fn is_power_of_ten<T: Power10>(x: T) -> bool {
 
 /// Returns the base 10 logarithm value, truncated down.
 #[inline]
-pub fn floor_log10<T: Power10>(x: T) -> u32 {
-    x.floor_log10()
+pub fn log10<T: Power10>(x: T) -> u32 {
+    x.log10()
+}
+
+/// Returns the base 10 logarithm value, truncated down.
+#[inline]
+pub fn checked_log10<T: Power10>(x: T) -> u32 {
+    x.checked_log10()
+}
+
+/// Returns the base 10 logarithm value, truncated down.
+#[inline]
+pub fn unchecked_log10<T: Power10>(x: T) -> u32 {
+    x.unchecked_log10()
 }
 
 /// Returns a power of ten greater than or equal to the supplied value.
@@ -324,7 +361,7 @@ static POWER10_DIGITS_U64: [(u32, u64); 66] = [
 ];
 
 #[inline]
-fn floor_log10_u8(v: u8) -> u32 {
+fn log10_u8(v: u8) -> u32 {
     if v >= 100 {
         return 2;
     }
@@ -335,19 +372,19 @@ fn floor_log10_u8(v: u8) -> u32 {
 }
 
 #[inline]
-fn floor_log10_u16(v: u16) -> u32 {
-    floor_log10_u32(v as u32)
+fn log10_u16(v: u16) -> u32 {
+    log10_u32(v as u32)
 }
 
 #[inline]
-fn floor_log10_u32(v: u32) -> u32 {
+fn log10_u32(v: u32) -> u32 {
     let lz = v.leading_zeros();
     let (digits, pow10) = POWER10_DIGITS_U32[lz as usize];
     digits + ((v >= pow10) as u32)
 }
 
 #[inline]
-fn floor_log10_u64(v: u64) -> u32 {
+fn log10_u64(v: u64) -> u32 {
     let lz = v.leading_zeros();
     let (digits, pow10) = POWER10_DIGITS_U64[lz as usize];
     digits + ((v >= pow10) as u32)
@@ -355,14 +392,14 @@ fn floor_log10_u64(v: u64) -> u32 {
 
 #[cfg(target_pointer_width = "64")]
 #[inline]
-fn floor_log10_usize(v: usize) -> u32 {
-    floor_log10_u64(v as u64)
+fn log10_usize(v: usize) -> u32 {
+    log10_u64(v as u64)
 }
 
 #[cfg(target_pointer_width = "32")]
 #[inline]
-fn floor_log10_usize(v: usize) -> u32 {
-    floor_log10_u32(v as u32)
+fn log10_usize(v: usize) -> u32 {
+    log10_u32(v as u32)
 }
 
 #[inline]
@@ -645,7 +682,7 @@ macro_rules! hide_u128 {
         ];
         
         #[inline]
-        fn floor_log10_u128(v: $T) -> u32 {
+        fn log10_u128(v: $T) -> u32 {
             let lz = v.leading_zeros();
             let (digits, pow10) = POWER10_DIGITS_U128[lz as usize];
             digits + ((v >= pow10) as u32)
@@ -681,10 +718,30 @@ macro_rules! unsigned_power10 {
             }
         
             #[inline]
-            fn floor_log10(&self) -> u32 {
+            fn unchecked_log10(&self) -> u32 {
                 $log_fn(*self)
             }
         
+            #[inline]
+            fn checked_log10(&self) -> u32 {
+                if 0 == *self {
+                    panic!("undefined value for log of zero");
+                }
+                $log_fn(*self)
+            }
+
+            #[cfg(debug_assertions)]
+            #[inline]
+            fn log10(&self) -> u32 {
+                self.checked_log10()
+            }
+
+            #[cfg(not(debug_assertions))]
+            #[inline]
+            fn log10(&self) -> u32 {
+                $log_fn(*self)
+            }
+
             #[inline]
             fn wrapping_next_power_of_ten(&self) -> $T {
                 $wrap_next_fn(*self)
@@ -721,37 +778,37 @@ macro_rules! unsigned_power10 {
 unsigned_power10!(
     u8,
     is_pow10_u8,
-    floor_log10_u8,
+    log10_u8,
     wrapping_next_power_of_ten_u8
 ); //https://github.com/rust-lang/rust/issues/29599
 unsigned_power10!(
     u16,
     is_pow10_u16,
-    floor_log10_u16,
+    log10_u16,
     wrapping_next_power_of_ten_u16
 );
 unsigned_power10!(
     u32,
     is_pow10_u32,
-    floor_log10_u32,
+    log10_u32,
     wrapping_next_power_of_ten_u32
 );
 unsigned_power10!(
     u64,
     is_pow10_u64,
-    floor_log10_u64,
+    log10_u64,
     wrapping_next_power_of_ten_u64
 );
 #[cfg(has_i128)]
 unsigned_power10!(
     u128,
     is_pow10_u128,
-    floor_log10_u128,
+    log10_u128,
     wrapping_next_power_of_ten_u128
 );
 unsigned_power10!(
     usize,
     is_pow10_usize,
-    floor_log10_usize,
+    log10_usize,
     wrapping_next_power_of_ten_usize
 );

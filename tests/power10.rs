@@ -6,7 +6,7 @@ use num_traits::ToPrimitive;
 
 fn log10_compare_with_f64<T: Power10 + ToPrimitive>(x: T) {
     let expected = x.to_f64().unwrap().log10().floor() as u32;
-    assert_eq!(x.floor_log10(), expected); //, "{}", x.to_f64().unwrap()
+    assert_eq!(x.log10(), expected); //, "{}", x.to_f64().unwrap()
 }
 
 macro_rules! unsigned_power10 {
@@ -14,7 +14,9 @@ macro_rules! unsigned_power10 {
         mod $I {
             use super::log10_compare_with_f64;
             use num_integer::checked_next_power_of_ten;
-            use num_integer::floor_log10;
+            use num_integer::log10;
+            use num_integer::checked_log10;
+            use num_integer::unchecked_log10;
             use num_integer::is_power_of_ten;
             use num_integer::wrapping_next_power_of_ten;
             use num_integer::Power10;
@@ -36,9 +38,39 @@ macro_rules! unsigned_power10 {
                 assert_eq!((x + 1).is_power_of_ten(), false);
             }
 
+            #[cfg(debug_assertions)]
             #[test]
-            fn test_floor_log10() {
-                assert_eq!((0 as $T).floor_log10(), 0);
+            #[should_panic]
+            fn test_log10_zero_debug() {
+                assert_eq!((0 as $T).log10(), 0);
+            }
+
+            #[cfg(not(debug_assertions))]
+            #[test]
+            fn test_log10_zero_release() {
+                assert_eq!((0 as $T).log10(), 0);
+            }
+
+            #[test]
+            fn test_unchecked_log10_zero() {
+                assert_eq!((0 as $T).unchecked_log10(), 0);
+                assert_eq!(unchecked_log10(0 as $T), 0);
+            }
+
+            #[test]
+            #[should_panic]
+            fn test_checked_log10_zero() {
+                assert_eq!((0 as $T).checked_log10(), 0);
+            }
+
+            #[test]
+            #[should_panic]
+            fn test_fn_checked_log10_zero() {
+                assert_eq!(checked_log10(0 as $T), 0);
+            }
+
+            #[test]
+            fn test_log10() {
                 log10_compare_with_f64(<$T>::max_value());
                 log10_compare_with_f64(<$T>::max_value() - 1);
                 log10_compare_with_f64(<$T>::max_value() - 2);
@@ -46,24 +78,26 @@ macro_rules! unsigned_power10 {
                 let mut count: u32 = 0;
                 let end: $T = <$T>::max_value() / 10;
                 while x < end {
-                    assert_eq!(floor_log10(x), count);
+                    assert_eq!(log10(x), count);
                     if x > 1 {
-                        assert_eq!((x - 1).floor_log10(), count - 1);
+                        assert_eq!((x - 1).log10(), count - 1);
                     }
-                    assert_eq!((x + 1).floor_log10(), count);
+                    assert_eq!((x + 1).log10(), count);
                     x *= 10;
                     count += 1;
                 }
-                assert_eq!(x.floor_log10(), count);
-                assert_eq!((x - 1).floor_log10(), count - 1);
-                assert_eq!((x + 1).floor_log10(), count);
+                assert_eq!(x.log10(), count);
+                assert_eq!((x - 1).log10(), count - 1);
+                assert_eq!((x + 1).log10(), count);
 
                 //powers of 2
                 x = 1;
                 while x != 0 {
                     log10_compare_with_f64(x);
                     log10_compare_with_f64(x + 1);
-                    log10_compare_with_f64(x - 1);
+                    if x > 1 {
+                        log10_compare_with_f64(x - 1);
+                    }
                     x <<= 1;
                 }
             }
@@ -112,12 +146,14 @@ macro_rules! unsigned_power10 {
                 }
             }
         
+            #[cfg(debug_assertions)]
             #[test]
             #[should_panic]
             fn test_next_power_10_panic1() {
                 assert_eq!(<$T>::max_value().next_power_of_ten(), 0);
             }
         
+            #[cfg(debug_assertions)]
             #[test]
             #[should_panic]
             fn test_next_power_10_panic2() {
@@ -183,7 +219,7 @@ unsigned_power10!(u64, u64);
 unsigned_power10!(u128, u128);
 unsigned_power10!(usize, usize);
 
-// this function generates the table used for floor_log10
+// this function generates the table used for log10
 // run with --release to avoid overflow
 // it then has to be reversed (I used tac)
 //#[test]
