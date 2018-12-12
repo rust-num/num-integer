@@ -73,6 +73,24 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// ~~~
     fn mod_floor(&self, other: &Self) -> Self;
 
+    /// Ceiled integer division.
+    ///
+    /// # Examples
+    ///
+    /// ~~~
+    /// # use num_integer::Integer;
+    /// assert_eq!(( 8).div_ceil( &3),  3);
+    /// assert_eq!(( 8).div_ceil(&-3), -2);
+    /// assert_eq!((-8).div_ceil( &3), -2);
+    /// assert_eq!((-8).div_ceil(&-3),  3);
+    ///
+    /// assert_eq!(( 1).div_ceil( &2), 1);
+    /// assert_eq!(( 1).div_ceil(&-2), 0);
+    /// assert_eq!((-1).div_ceil( &2), 0);
+    /// assert_eq!((-1).div_ceil(&-2), 1);
+    /// ~~~
+    fn div_ceil(&self, other: &Self) -> Self;
+
     /// Greatest Common Divisor (GCD).
     ///
     /// # Examples
@@ -171,6 +189,32 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     fn div_mod_floor(&self, other: &Self) -> (Self, Self) {
         (self.div_floor(other), self.mod_floor(other))
     }
+
+    /// Rounds up to nearest multiple of argument.
+    ///
+    /// # Examples
+    ///
+    /// ~~~
+    /// # use num_integer::Integer;
+    /// assert_eq!(16.round_up_to(&8), 16);
+    /// assert_eq!(23.round_up_to(&8), 24);
+    /// ~~~
+    fn round_up_to(&self, other: &Self) -> Self where Self: traits::NumRef {
+        self.div_ceil(other).mul(other)
+    }
+
+    /// Rounds down to nearest multiple of argument.
+    ///
+    /// # Examples
+    ///
+    /// ~~~
+    /// # use num_integer::Integer;
+    /// assert_eq!(16.round_down_to(&8), 16);
+    /// assert_eq!(23.round_down_to(&8), 16);
+    /// ~~~
+    fn round_down_to(&self, other: &Self) -> Self where Self: traits::NumRef {
+        self.div_floor(other).mul(other)
+    }
 }
 
 /// Simultaneous integer division and modulus
@@ -192,6 +236,11 @@ pub fn mod_floor<T: Integer>(x: T, y: T) -> T {
 #[inline]
 pub fn div_mod_floor<T: Integer>(x: T, y: T) -> (T, T) {
     x.div_mod_floor(&y)
+}
+/// Ceiled integer division
+#[inline]
+pub fn div_ceil<T: Integer>(x: T, y: T) -> T {
+    x.div_ceil(&y)
 }
 
 /// Calculates the Greatest Common Divisor (GCD) of the number and `other`. The
@@ -242,6 +291,15 @@ macro_rules! impl_integer_for_isize {
                     (d, r) if (r > 0 && *other < 0)
                            || (r < 0 && *other > 0) => (d - 1, r + *other),
                     (d, r)                          => (d, r),
+                }
+            }
+
+            #[inline]
+            fn div_ceil(&self, other: &Self) -> Self {
+                match self.div_rem(other) {
+                    (d, r) if (r > 0 && *other > 0)
+                           || (r < 0 && *other < 0) => d + 1,
+                    (d, _)                          => d,
                 }
             }
 
@@ -525,6 +583,11 @@ macro_rules! impl_integer_for_usize {
             #[inline]
             fn mod_floor(&self, other: &Self) -> Self {
                 *self % *other
+            }
+
+            #[inline]
+            fn div_ceil(&self, other: &Self) -> Self {
+                *self / *other + (0 != *self % *other) as Self
             }
 
             /// Calculates the Greatest Common Divisor (GCD) of the number and `other`
