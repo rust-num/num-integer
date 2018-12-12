@@ -199,6 +199,7 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// assert_eq!(16.round_up_to(&8), 16);
     /// assert_eq!(23.round_up_to(&8), 24);
     /// ~~~
+    #[inline]
     fn round_up_to(&self, other: &Self) -> Self where Self: traits::NumRef {
         self.div_ceil(other).mul(other)
     }
@@ -212,6 +213,7 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// assert_eq!(16.round_down_to(&8), 16);
     /// assert_eq!(23.round_down_to(&8), 16);
     /// ~~~
+    #[inline]
     fn round_down_to(&self, other: &Self) -> Self where Self: traits::NumRef {
         self.div_floor(other).mul(other)
     }
