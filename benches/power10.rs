@@ -450,11 +450,11 @@ fn random_10000_vec_u8() -> Vec<u8> {
 
 fn first_10000_vec<T: PrimInt + One + Zero>() -> Vec<T> {
     let mut v = Vec::with_capacity(10000);
-    let mut x: T = <T>::zero();
+    let mut x: T = <T>::one();
     let one: T = <T>::one();
     let ten = (one << 3) + (one << 1);
     let tenk = ten * ten * ten * ten;
-    while x < tenk {
+    while x <= tenk {
         v.push(x);
         x = x + one;
     }
