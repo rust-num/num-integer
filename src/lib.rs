@@ -33,7 +33,7 @@ pub use roots::{sqrt, cbrt, nth_root};
 mod power10;
 pub use power10::Power10;
 pub use power10::{
-    checked_next_power_of_ten, log10, unchecked_log10, checked_log10,
+    checked_next_power_of_ten, log10, checked_log10,
     is_power_of_ten, next_power_of_ten, wrapping_next_power_of_ten,
 };
 

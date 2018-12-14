@@ -14,7 +14,7 @@ pub trait Power10: Integer {
     fn is_power_of_ten(&self) -> bool;
 
     /// Returns the base 10 logarithm value, truncated down.
-    /// Returns zero for zero in release mode, panics in debug mode.
+    /// Panics if the input is zero.
     ///
     /// # Examples
     ///
@@ -32,23 +32,11 @@ pub trait Power10: Integer {
     ///
     /// ~~~
     /// use num_integer::Power10;
-    /// assert_eq!(100u32.checked_log10(), 2);
-    /// assert_eq!(4u32.checked_log10(), 0);
+    /// assert_eq!(100u32.checked_log10(), Some(2));
+    /// assert_eq!(4u32.checked_log10(), Some(0));
+    /// assert_eq!(0u32.checked_log10(), None);
     /// ~~~
-    fn checked_log10(&self) -> u32;
-
-    /// Returns the base 10 logarithm value, truncated down.
-    /// Returns zero for zero. (This matches f64::log10()::floor() for zero.)
-    ///
-    /// # Examples
-    ///
-    /// ~~~
-    /// use num_integer::Power10;
-    /// assert_eq!(100u32.unchecked_log10(), 2);
-    /// assert_eq!(4u32.unchecked_log10(), 0);
-    /// assert_eq!(0u32.unchecked_log10(), 0);
-    /// ~~~
-    fn unchecked_log10(&self) -> u32;
+    fn checked_log10(&self) -> Option<u32>;
 
     /// Returns a power of ten greater than or equal to the supplied value.
     /// If the next power of ten is larger than `max_value()`, 0 is returned.
@@ -105,14 +93,8 @@ pub fn log10<T: Power10>(x: T) -> u32 {
 
 /// Returns the base 10 logarithm value, truncated down.
 #[inline]
-pub fn checked_log10<T: Power10>(x: T) -> u32 {
+pub fn checked_log10<T: Power10>(x: T) -> Option<u32> {
     x.checked_log10()
-}
-
-/// Returns the base 10 logarithm value, truncated down.
-#[inline]
-pub fn unchecked_log10<T: Power10>(x: T) -> u32 {
-    x.unchecked_log10()
 }
 
 /// Returns a power of ten greater than or equal to the supplied value.
@@ -718,27 +700,18 @@ macro_rules! unsigned_power10 {
             }
         
             #[inline]
-            fn unchecked_log10(&self) -> u32 {
-                $log_fn(*self)
+            fn checked_log10(&self) -> Option<u32> {
+                if 0 == *self {
+                    return None;
+                }
+                Some($log_fn(*self))
             }
-        
+
             #[inline]
-            fn checked_log10(&self) -> u32 {
+            fn log10(&self) -> u32 {
                 if 0 == *self {
                     panic!("undefined value for log of zero");
                 }
-                $log_fn(*self)
-            }
-
-            #[cfg(debug_assertions)]
-            #[inline]
-            fn log10(&self) -> u32 {
-                self.checked_log10()
-            }
-
-            #[cfg(not(debug_assertions))]
-            #[inline]
-            fn log10(&self) -> u32 {
                 $log_fn(*self)
             }
 

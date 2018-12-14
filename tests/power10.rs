@@ -16,7 +16,6 @@ macro_rules! unsigned_power10 {
             use num_integer::checked_next_power_of_ten;
             use num_integer::log10;
             use num_integer::checked_log10;
-            use num_integer::unchecked_log10;
             use num_integer::is_power_of_ten;
             use num_integer::wrapping_next_power_of_ten;
             use num_integer::Power10;
@@ -38,39 +37,22 @@ macro_rules! unsigned_power10 {
                 assert_eq!((x + 1).is_power_of_ten(), false);
             }
 
-            #[cfg(debug_assertions)]
             #[test]
             #[should_panic]
             fn test_log10_zero_debug() {
                 assert_eq!((0 as $T).log10(), 0);
             }
 
-            #[cfg(not(debug_assertions))]
-            #[test]
-            fn test_log10_zero_release() {
-                assert_eq!((0 as $T).log10(), 0);
-            }
-
-            #[test]
-            fn test_unchecked_log10_zero() {
-                assert_eq!((0 as $T).unchecked_log10(), 0);
-                assert_eq!(unchecked_log10(0 as $T), 0);
-            }
-
-            #[test]
-            #[should_panic]
-            fn test_checked_log10_zero() {
-                assert_eq!((0 as $T).checked_log10(), 0);
-            }
-
             #[test]
             #[should_panic]
             fn test_fn_checked_log10_zero() {
-                assert_eq!(checked_log10(0 as $T), 0);
+                assert_eq!(log10(0 as $T), 0);
             }
 
             #[test]
             fn test_log10() {
+                assert_eq!((0 as $T).checked_log10(), None);
+                assert_eq!(checked_log10(1 as $T), Some(0));
                 log10_compare_with_f64(<$T>::max_value());
                 log10_compare_with_f64(<$T>::max_value() - 1);
                 log10_compare_with_f64(<$T>::max_value() - 2);
