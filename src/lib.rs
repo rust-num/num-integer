@@ -89,7 +89,10 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// assert_eq!((-1).div_ceil( &2), 0);
     /// assert_eq!((-1).div_ceil(&-2), 1);
     /// ~~~
-    fn div_ceil(&self, other: &Self) -> Self;
+    fn div_ceil(&self, other: &Self) -> Self {
+        let (q, r) = self.div_mod_floor(other);
+        if r.is_zero() { q } else { q+Self::one() }
+    }
 
     /// Greatest Common Divisor (GCD).
     ///
