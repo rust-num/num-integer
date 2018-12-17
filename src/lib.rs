@@ -204,7 +204,8 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// ~~~
     #[inline]
     fn next_multiple_of(&self, other: &Self) -> Self where Self: Clone {
-        self.div_ceil(other).mul(other.clone())
+        let m = self.mod_floor(other);
+        self.clone() + if m.is_zero() { Self::zero() } else { other.clone() - m }
     }
 
     /// Rounds down to nearest multiple of argument.
@@ -218,7 +219,7 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// ~~~
     #[inline]
     fn next_multiple_back_of(&self, other: &Self) -> Self where Self: Clone {
-        self.div_floor(other).mul(other.clone())
+        self.clone() - self.mod_floor(other)
     }
 }
 
