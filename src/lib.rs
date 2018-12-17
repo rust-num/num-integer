@@ -203,8 +203,8 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// assert_eq!(23.next_multiple_of(&8), 24);
     /// ~~~
     #[inline]
-    fn next_multiple_of(&self, other: &Self) -> Self where Self: traits::NumRef {
-        self.div_ceil(other).mul(other)
+    fn next_multiple_of(&self, other: &Self) -> Self where Self: Clone {
+        self.div_ceil(other).mul(other.clone())
     }
 
     /// Rounds down to nearest multiple of argument.
@@ -217,8 +217,8 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// assert_eq!(23.next_multiple_back_of(&8), 16);
     /// ~~~
     #[inline]
-    fn next_multiple_back_of(&self, other: &Self) -> Self where Self: traits::NumRef {
-        self.div_floor(other).mul(other)
+    fn next_multiple_back_of(&self, other: &Self) -> Self where Self: Clone {
+        self.div_floor(other).mul(other.clone())
     }
 }
 
