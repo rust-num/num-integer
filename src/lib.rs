@@ -199,11 +199,11 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     ///
     /// ~~~
     /// # use num_integer::Integer;
-    /// assert_eq!(16.round_up_to(&8), 16);
-    /// assert_eq!(23.round_up_to(&8), 24);
+    /// assert_eq!(16.next_multiple_of(&8), 16);
+    /// assert_eq!(23.next_multiple_of(&8), 24);
     /// ~~~
     #[inline]
-    fn round_up_to(&self, other: &Self) -> Self where Self: traits::NumRef {
+    fn next_multiple_of(&self, other: &Self) -> Self where Self: traits::NumRef {
         self.div_ceil(other).mul(other)
     }
 
@@ -213,11 +213,11 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     ///
     /// ~~~
     /// # use num_integer::Integer;
-    /// assert_eq!(16.round_down_to(&8), 16);
-    /// assert_eq!(23.round_down_to(&8), 16);
+    /// assert_eq!(16.next_multiple_back_of(&8), 16);
+    /// assert_eq!(23.next_multiple_back_of(&8), 16);
     /// ~~~
     #[inline]
-    fn round_down_to(&self, other: &Self) -> Self where Self: traits::NumRef {
+    fn next_multiple_back_of(&self, other: &Self) -> Self where Self: traits::NumRef {
         self.div_floor(other).mul(other)
     }
 }
