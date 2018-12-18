@@ -24,7 +24,7 @@ extern crate num_traits as traits;
 
 use core::ops::Add;
 
-use traits::{Num, Signed};
+use traits::{Num, Signed, Zero};
 
 mod roots;
 pub use roots::Roots;
@@ -92,6 +92,7 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// # use num_integer::Integer;
     /// assert_eq!(7.lcm(&3), 21);
     /// assert_eq!(2.lcm(&4), 4);
+    /// assert_eq!(0.lcm(&0), 0);
     /// ~~~
     fn lcm(&self, other: &Self) -> Self;
 
@@ -293,8 +294,9 @@ macro_rules! impl_integer_for_isize {
             /// `other`.
             #[inline]
             fn lcm(&self, other: &Self) -> Self {
-                // should not have to recalculate abs
-                (*self * (*other / self.gcd(other))).abs()
+                if self.is_zero() && other.is_zero() { Self::zero() }
+                else { // should not have to recalculate abs
+                       (*self * (*other / self.gcd(other))).abs() }
             }
 
             /// Deprecated, use `is_multiple_of` instead.
@@ -557,7 +559,8 @@ macro_rules! impl_integer_for_usize {
             /// Calculates the Lowest Common Multiple (LCM) of the number and `other`.
             #[inline]
             fn lcm(&self, other: &Self) -> Self {
-                *self * (*other / self.gcd(other))
+                if self.is_zero() && other.is_zero() { Self::zero() }
+                else { *self * (*other / self.gcd(other)) }
             }
 
             /// Deprecated, use `is_multiple_of` instead.
