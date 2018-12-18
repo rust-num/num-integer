@@ -1,4 +1,4 @@
-use traits::Zero;
+use traits::{Zero, checked_pow};
 
 use Integer;
 
@@ -97,7 +97,7 @@ macro_rules! impl_Power {
             let mut a = None;
             while !n.is_zero() {
                 a = Some(a.map_or(0, |a| a+1));
-                n /= other;
+                n /= *other;
             }
             a
         }
@@ -106,13 +106,14 @@ macro_rules! impl_Power {
         fn checked_next_power_of(&self, other: &Self) -> Option<Self> {
             self.checked_sub(1)
                 .map_or(Some(1), |new|
-                        traits::checked_pow(*other,
-                                            new.checked_log(other)
-                                               .map_or(0, |a| a as Self + 1) as usize))
+                        checked_pow(*other, new.checked_log(other)
+                                        .map_or(0, |a| a as Self + 1) as usize))
         }
     });
 
     ($($t:ty),*) => { $(impl_Power!($t);)* };
 }
 
-impl_Power!(usize, u8, u16, u32, u64, u128);
+impl_Power!(usize, u8, u16, u32, u64);
+#[cfg(has_i128)]
+impl_Power!(u128);
