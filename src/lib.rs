@@ -30,6 +30,9 @@ mod roots;
 pub use roots::Roots;
 pub use roots::{sqrt, cbrt, nth_root};
 
+mod power;
+pub use power::Power;
+
 pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// Floored integer division.
     ///
