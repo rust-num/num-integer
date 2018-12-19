@@ -119,15 +119,18 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// # Examples
     ///
     /// ~~~
+    /// # extern crate num_integer;
     /// # extern crate num_traits;
+    /// # fn main() {
     /// # use num_integer::{ExtendedGcd, Integer};
     /// # use num_traits::NumAssign;
-    /// fn check<A: Clone + Integer + NumAssign>(a: A, b: A) -> bool {
-    ///     let ExtendedGcd { gcd, coeffs: [x, y], .. } = a.extended_gcd(&b);
-    ///     gcd == x * a + y * b
+    /// fn check<A: Copy + Integer + NumAssign>(a: A, b: A) -> bool {
+    ///     let ExtendedGcd { gcd, coeffs, .. } = a.extended_gcd(&b);
+    ///     gcd == coeffs[0] * a + coeffs[1] * b
     /// }
     /// assert!(check(10isize, 4isize));
     /// assert!(check(8isize,  9isize));
+    /// # }
     /// ~~~
     #[inline]
     fn extended_gcd(&self, other: &Self) -> ExtendedGcd<Self>
@@ -238,11 +241,18 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
 }
 
 /// Greatest common divisor and Bézout coefficients
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Copy, PartialEq, Eq)]
+#[cfg_attr(array_clone, derive(Clone))]
 pub struct ExtendedGcd<A> {
     pub gcd: A,
     pub coeffs: [A; 2],
     _hidden: (),
+}
+
+#[cfg(not(array_clone))]
+impl<A: Copy> Clone for ExtendedGcd<A> {
+    #[inline]
+    fn clone(&self) -> Self { *self }
 }
 
 /// Simultaneous integer division and modulus
@@ -585,9 +595,8 @@ macro_rules! impl_integer_for_isize {
             #[test]
             fn test_gcd_lcm() {
                 use core::iter::once;
-                let r = once(0).chain((1..).take(127).flat_map(|a| once(a).chain(once(-a)))).chain(once(-128));
-                for i in r.clone() {
-                    for j in r.clone() {
+                for i in once(0).chain((1..).take(127).flat_map(|a| once(a).chain(once(-a)))).chain(once(-128)) {
+                    for j in once(0).chain((1..).take(127).flat_map(|a| once(a).chain(once(-a)))).chain(once(-128)) {
                         assert_eq!(i.gcd_lcm(&j), (i.gcd(&j), i.lcm(&j)));
                     }
                 }
@@ -598,15 +607,14 @@ macro_rules! impl_integer_for_isize {
                 use ExtendedGcd;
                 use traits::NumAssign;
 
-                fn check<A: Clone + Integer + NumAssign>(a: A, b: A) -> bool {
-                    let ExtendedGcd { gcd, coeffs: [x, y], .. } = a.extended_gcd(&b);
-                    gcd == x * a + y * b
+                fn check<A: Copy + Integer + NumAssign>(a: A, b: A) -> bool {
+                    let ExtendedGcd { gcd, coeffs, .. } = a.extended_gcd(&b);
+                    gcd == coeffs[0] * a + coeffs[1] * b
                 }
 
                 use core::iter::once;
-                let r = once(0).chain((1..).take(127).flat_map(|a| once(a).chain(once(-a)))).chain(once(-128));
-                for i in r.clone() {
-                    for j in r.clone() {
+                for i in once(0).chain((1..).take(127).flat_map(|a| once(a).chain(once(-a)))).chain(once(-128)) {
+                    for j in once(0).chain((1..).take(127).flat_map(|a| once(a).chain(once(-a)))).chain(once(-128)) {
                         check(i, j);
                         let (ExtendedGcd { gcd, .. }, lcm) = i.extended_gcd_lcm(&j);
                         assert_eq!((gcd, lcm), (i.gcd(&j), i.lcm(&j)));
