@@ -6,8 +6,7 @@ extern crate num_integer;
 extern crate num_traits;
 extern crate test;
 
-use num_integer::{Average, Integer};
-use num_traits::checked_pow;
+use num_integer::Integer;
 use num_traits::{AsPrimitive, PrimInt, WrappingAdd, WrappingMul};
 use test::{black_box, Bencher};
 

@@ -1,15 +1,14 @@
 use core::ops::{Add, BitAnd, BitOr, BitXor, Shr, Sub};
 use Integer;
 
+/// Provides methods to compute the average of two integers, without overflows.
 pub trait Average: Integer {
-    /// Returns the floor value of the average of `self` and `other`.
-    /// -- `⌊(self + other)/2⌋
+    /// Returns the ceiling value of the average of `self` and `other`.
+    /// -- `⌈(self + other)/2⌉`
     ///
     /// # Examples
     ///
     /// ```
-    /// # extern crate num_traits;
-    /// # use num_traits::bounds::Bounded;
     /// use num_integer::Average;
     ///
     /// assert_eq!(( 3).average_ceil(&10),  7);
@@ -21,14 +20,12 @@ pub trait Average: Integer {
     ///
     fn average_ceil(&self, other: &Self) -> Self;
 
-    /// Returns the ceil value of the average of `self` and `other`.
-    /// -- `⌈(self + other)/2⌉
+    /// Returns the floor value of the average of `self` and `other`.
+    /// -- `⌊(self + other)/2⌋`
     ///
     /// # Examples
     ///
     /// ```
-    /// # extern crate num_traits;
-    /// # use num_traits::bounds::Bounded;
     /// use num_integer::Average;
     ///
     /// assert_eq!(( 3).average_floor(&10),  6);
