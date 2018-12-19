@@ -53,22 +53,28 @@ macro_rules! naive_average {
     ($T:ident) => {
         impl super::NaiveAverage for $T {
             fn naive_average_floor(&self, other: &$T) -> $T {
-                let (x, y) = if self > other {
-                    (self, other)
-                } else {
-                    (other, self)
-                };
-                let diff = x - y;
-                y + (diff / 2)
+                match self.checked_add(*other) {
+                    Some(z) => z/2,
+                    None => if self > other {
+                        let diff = self - other;
+                        other + diff/2
+                    } else {
+                        let diff = other - self;
+                        self + diff/2
+                    }
+                }
             }
             fn naive_average_ceil(&self, other: &$T) -> $T {
-                let (x, y) = if self > other {
-                    (self, other)
-                } else {
-                    (other, self)
-                };
-                let diff = x - y;
-                x - (diff / 2)
+                match self.checked_add(*other).and_then(|x| x.checked_add(1)) {
+                    Some(z) => z/2,
+                    None => if self > other {
+                        let diff = self - other;
+                        self - diff/2
+                    } else {
+                        let diff = other - self;
+                        other - diff/2
+                    }
+                }
             }
         }
     };

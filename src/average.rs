@@ -44,7 +44,7 @@ where
     for<'a, 'b> &'a I:
         BitAnd<&'b I, Output = I> + BitOr<&'b I, Output = I> + BitXor<&'b I, Output = I>,
 {
-    // The Henry Gordon Dietz, implementation as shown in the Hacker's Delight,
+    // The Henry Gordon Dietz implementation as shown in the Hacker's Delight,
     // see http://aggregate.org/MAGIC/#Average%20of%20Integers
 
     /// Returns the floor value of the average of `self` and `other`.
@@ -66,8 +66,8 @@ where
 pub fn average_floor<T: Average>(x: &T, y: &T) -> T {
     x.average_floor(y)
 }
-/// Returns the ceil value of the average of `x` and `y` --
-/// see [Average::average_floor](trait.Average.html#tymethod.average_floor).
+/// Returns the ceiling value of the average of `x` and `y` --
+/// see [Average::average_ceil](trait.Average.html#tymethod.average_ceil).
 #[inline]
 pub fn average_ceil<T: Average>(x: &T, y: &T) -> T {
     x.average_ceil(y)
