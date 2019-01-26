@@ -115,7 +115,7 @@ impl_gcd_old_for_usize!(usize);
 impl_gcd_old_for_usize!(u128);
 
 /// Return an iterator that yields all Fibonacci numbers fitting into a u128.
-fn fibonacci() -> impl Iterator<Item=u128> {
+fn fibonacci() -> impl Iterator<Item = u128> {
     (0..185).scan((0, 1), |&mut (ref mut a, ref mut b), _| {
         let tmp = *a;
         *a = *b;
