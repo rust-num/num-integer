@@ -195,6 +195,10 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
 
     /// Rounds up to nearest multiple of argument.
     ///
+    /// # Notes
+    ///
+    /// For signed types, `a.next_multiple_of(b) = a.prev_multiple_of(b.neg())`.
+    ///
     /// # Examples
     ///
     /// ~~~
@@ -215,6 +219,10 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     }
 
     /// Rounds down to nearest multiple of argument.
+    ///
+    /// # Notes
+    ///
+    /// For signed types, `a.prev_multiple_of(b) = a.next_multiple_of(b.neg())`.
     ///
     /// # Examples
     ///
