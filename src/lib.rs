@@ -91,7 +91,11 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// ~~~
     fn div_ceil(&self, other: &Self) -> Self {
         let (q, r) = self.div_mod_floor(other);
-        if r.is_zero() { q } else { q+Self::one() }
+        if r.is_zero() {
+            q
+        } else {
+            q + Self::one()
+        }
     }
 
     /// Greatest Common Divisor (GCD).
@@ -213,9 +217,17 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// assert_eq!((-23).next_multiple_of(&-8), -24);
     /// ~~~
     #[inline]
-    fn next_multiple_of(&self, other: &Self) -> Self where Self: Clone {
+    fn next_multiple_of(&self, other: &Self) -> Self
+    where
+        Self: Clone,
+    {
         let m = self.mod_floor(other);
-        self.clone() + if m.is_zero() { Self::zero() } else { other.clone() - m }
+        self.clone()
+            + if m.is_zero() {
+                Self::zero()
+            } else {
+                other.clone() - m
+            }
     }
 
     /// Rounds down to nearest multiple of argument.
@@ -238,7 +250,10 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// assert_eq!((-23).prev_multiple_of(&-8), -16);
     /// ~~~
     #[inline]
-    fn prev_multiple_of(&self, other: &Self) -> Self where Self: Clone {
+    fn prev_multiple_of(&self, other: &Self) -> Self
+    where
+        Self: Clone,
+    {
         self.clone() - self.mod_floor(other)
     }
 }
@@ -322,10 +337,11 @@ macro_rules! impl_integer_for_isize {
 
             #[inline]
             fn div_ceil(&self, other: &Self) -> Self {
-                match self.div_rem(other) {
-                    (d, r) if (r > 0 && *other > 0)
-                           || (r < 0 && *other < 0) => d + 1,
-                    (d, _)                          => d,
+                let (d, r) = self.div_rem(other);
+                if (r > 0 && *other > 0) || (r < 0 && *other < 0) {
+                    d + 1
+                } else {
+                    d
                 }
             }
 
