@@ -72,6 +72,31 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// ~~~
     fn mod_floor(&self, other: &Self) -> Self;
 
+    /// Ceiled integer division.
+    ///
+    /// # Examples
+    ///
+    /// ~~~
+    /// # use num_integer::Integer;
+    /// assert_eq!(( 8).div_ceil( &3),  3);
+    /// assert_eq!(( 8).div_ceil(&-3), -2);
+    /// assert_eq!((-8).div_ceil( &3), -2);
+    /// assert_eq!((-8).div_ceil(&-3),  3);
+    ///
+    /// assert_eq!(( 1).div_ceil( &2), 1);
+    /// assert_eq!(( 1).div_ceil(&-2), 0);
+    /// assert_eq!((-1).div_ceil( &2), 0);
+    /// assert_eq!((-1).div_ceil(&-2), 1);
+    /// ~~~
+    fn div_ceil(&self, other: &Self) -> Self {
+        let (q, r) = self.div_mod_floor(other);
+        if r.is_zero() {
+            q
+        } else {
+            q + Self::one()
+        }
+    }
+
     /// Greatest Common Divisor (GCD).
     ///
     /// # Examples
@@ -171,6 +196,66 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     fn div_mod_floor(&self, other: &Self) -> (Self, Self) {
         (self.div_floor(other), self.mod_floor(other))
     }
+
+    /// Rounds up to nearest multiple of argument.
+    ///
+    /// # Notes
+    ///
+    /// For signed types, `a.next_multiple_of(b) = a.prev_multiple_of(b.neg())`.
+    ///
+    /// # Examples
+    ///
+    /// ~~~
+    /// # use num_integer::Integer;
+    /// assert_eq!(( 16).next_multiple_of(& 8),  16);
+    /// assert_eq!(( 23).next_multiple_of(& 8),  24);
+    /// assert_eq!(( 16).next_multiple_of(&-8),  16);
+    /// assert_eq!(( 23).next_multiple_of(&-8),  16);
+    /// assert_eq!((-16).next_multiple_of(& 8), -16);
+    /// assert_eq!((-23).next_multiple_of(& 8), -16);
+    /// assert_eq!((-16).next_multiple_of(&-8), -16);
+    /// assert_eq!((-23).next_multiple_of(&-8), -24);
+    /// ~~~
+    #[inline]
+    fn next_multiple_of(&self, other: &Self) -> Self
+    where
+        Self: Clone,
+    {
+        let m = self.mod_floor(other);
+        self.clone()
+            + if m.is_zero() {
+                Self::zero()
+            } else {
+                other.clone() - m
+            }
+    }
+
+    /// Rounds down to nearest multiple of argument.
+    ///
+    /// # Notes
+    ///
+    /// For signed types, `a.prev_multiple_of(b) = a.next_multiple_of(b.neg())`.
+    ///
+    /// # Examples
+    ///
+    /// ~~~
+    /// # use num_integer::Integer;
+    /// assert_eq!(( 16).prev_multiple_of(& 8),  16);
+    /// assert_eq!(( 23).prev_multiple_of(& 8),  16);
+    /// assert_eq!(( 16).prev_multiple_of(&-8),  16);
+    /// assert_eq!(( 23).prev_multiple_of(&-8),  24);
+    /// assert_eq!((-16).prev_multiple_of(& 8), -16);
+    /// assert_eq!((-23).prev_multiple_of(& 8), -24);
+    /// assert_eq!((-16).prev_multiple_of(&-8), -16);
+    /// assert_eq!((-23).prev_multiple_of(&-8), -16);
+    /// ~~~
+    #[inline]
+    fn prev_multiple_of(&self, other: &Self) -> Self
+    where
+        Self: Clone,
+    {
+        self.clone() - self.mod_floor(other)
+    }
 }
 
 /// Simultaneous integer division and modulus
@@ -192,6 +277,11 @@ pub fn mod_floor<T: Integer>(x: T, y: T) -> T {
 #[inline]
 pub fn div_mod_floor<T: Integer>(x: T, y: T) -> (T, T) {
     x.div_mod_floor(&y)
+}
+/// Ceiled integer division
+#[inline]
+pub fn div_ceil<T: Integer>(x: T, y: T) -> T {
+    x.div_ceil(&y)
 }
 
 /// Calculates the Greatest Common Divisor (GCD) of the number and `other`. The
@@ -245,6 +335,16 @@ macro_rules! impl_integer_for_isize {
                     (d - 1, r + *other)
                 } else {
                     (d, r)
+                }
+            }
+
+            #[inline]
+            fn div_ceil(&self, other: &Self) -> Self {
+                let (d, r) = self.div_rem(other);
+                if (r > 0 && *other > 0) || (r < 0 && *other < 0) {
+                    d + 1
+                } else {
+                    d
                 }
             }
 
@@ -538,6 +638,11 @@ macro_rules! impl_integer_for_usize {
             #[inline]
             fn mod_floor(&self, other: &Self) -> Self {
                 *self % *other
+            }
+
+            #[inline]
+            fn div_ceil(&self, other: &Self) -> Self {
+                *self / *other + (0 != *self % *other) as Self
             }
 
             /// Calculates the Greatest Common Divisor (GCD) of the number and `other`
