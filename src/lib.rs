@@ -22,7 +22,7 @@ extern crate std;
 extern crate num_traits as traits;
 
 use core::mem;
-use core::ops::{Add, SubAssign};
+use core::ops::Add;
 
 use traits::{Num, Signed, Zero};
 
@@ -135,20 +135,21 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     #[inline]
     fn extended_gcd(&self, other: &Self) -> ExtendedGcd<Self>
     where
-        Self: Clone + SubAssign<Self>, {
+        Self: Clone {
         let mut s = (Self::zero(), Self::one());
         let mut t = (Self::one(), Self::zero());
         let mut r = (other.clone(), self.clone());
 
         while !r.0.is_zero() {
             let q = r.1.clone() / r.0.clone();
-            let f = |r: &mut (Self, Self)| {
+            let f = |mut r: (Self, Self)| {
                 mem::swap(&mut r.0, &mut r.1);
-                r.0 -= q.clone() * r.1.clone();
+                r.0 = r.0.clone() - q.clone() * r.1.clone();
+                r
             };
-            f(&mut r);
-            f(&mut s);
-            f(&mut t);
+            r = f(r);
+            s = f(s);
+            t = f(t);
         }
 
         if r.1 >= Self::zero() {
@@ -170,7 +171,7 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     #[inline]
     fn extended_gcd_lcm(&self, other: &Self) -> (ExtendedGcd<Self>, Self)
     where
-        Self: Clone + SubAssign<Self>, {
+        Self: Clone + Signed {
         (self.extended_gcd(other), self.lcm(other))
     }
 
