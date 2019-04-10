@@ -8,10 +8,6 @@ fn main() {
     } else if env::var_os("CARGO_FEATURE_I128").is_some() {
         panic!("i128 support was not detected!");
     }
-
-    if probe("#[derive(Clone)] struct A; fn main() { let _ = [A; 2].clone(); }") {
-        println!("cargo:rustc-cfg=array_clone");
-    }
 }
 
 /// Test if a code snippet can be compiled

@@ -125,8 +125,8 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// # use num_integer::{ExtendedGcd, Integer};
     /// # use num_traits::NumAssign;
     /// fn check<A: Copy + Integer + NumAssign>(a: A, b: A) -> bool {
-    ///     let ExtendedGcd { gcd, coeffs, .. } = a.extended_gcd(&b);
-    ///     gcd == coeffs[0] * a + coeffs[1] * b
+    ///     let ExtendedGcd { gcd, x, y, .. } = a.extended_gcd(&b);
+    ///     gcd == x * a + y * b
     /// }
     /// assert!(check(10isize, 4isize));
     /// assert!(check(8isize,  9isize));
@@ -155,13 +155,15 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
         if r.1 >= Self::zero() {
             ExtendedGcd {
                 gcd: r.1,
-                coeffs: [s.1, t.1],
+                x: s.1,
+                y: t.1,
                 _hidden: (),
             }
         } else {
             ExtendedGcd {
                 gcd: Self::zero() - r.1,
-                coeffs: [Self::zero() - s.1, Self::zero() - t.1],
+                x: Self::zero() - s.1,
+                y: Self::zero() - t.1,
                 _hidden: (),
             }
         }
@@ -254,18 +256,17 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
 }
 
 /// Greatest common divisor and Bézout coefficients
-#[derive(Debug, Copy, PartialEq, Eq)]
-#[cfg_attr(array_clone, derive(Clone))]
+///
+/// ```no_build
+/// let e = isize::extended_gcd(a, b);
+/// assert_eq!(e.gcd, e.x*a + e.y*b);
+/// ```
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ExtendedGcd<A> {
     pub gcd: A,
-    pub coeffs: [A; 2],
+    pub x: A,
+    pub y: A,
     _hidden: (),
-}
-
-#[cfg(not(array_clone))]
-impl<A: Copy> Clone for ExtendedGcd<A> {
-    #[inline]
-    fn clone(&self) -> Self { *self }
 }
 
 /// Simultaneous integer division and modulus
@@ -630,8 +631,8 @@ macro_rules! impl_integer_for_isize {
                 use ExtendedGcd;
 
                 fn check<A: Copy + Integer + NumAssign>(a: A, b: A) -> bool {
-                    let ExtendedGcd { gcd, coeffs, .. } = a.extended_gcd(&b);
-                    gcd == coeffs[0] * a + coeffs[1] * b
+                    let ExtendedGcd { gcd, x, y, .. } = a.extended_gcd(&b);
+                    gcd == x * a + y * b
                 }
 
                 use core::iter::once;
