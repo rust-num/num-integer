@@ -335,7 +335,7 @@ macro_rules! unsigned_roots {
 
                     if bits::<$T>() <= 32 {
                         // Implementation based on Hacker's Delight `icbrt2`
-                        let mut x = a ;
+                        let mut x = a;
                         let mut y2 = 0;
                         let mut y = 0;
                         let smax = bits::<$T>() / 3;
