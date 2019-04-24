@@ -135,7 +135,8 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     #[inline]
     fn extended_gcd(&self, other: &Self) -> ExtendedGcd<Self>
     where
-        Self: Clone {
+        Self: Clone,
+    {
         let mut s = (Self::zero(), Self::one());
         let mut t = (Self::one(), Self::zero());
         let mut r = (other.clone(), self.clone());
@@ -173,7 +174,8 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     #[inline]
     fn extended_gcd_lcm(&self, other: &Self) -> (ExtendedGcd<Self>, Self)
     where
-        Self: Clone + Signed {
+        Self: Clone + Signed,
+    {
         (self.extended_gcd(other), self.lcm(other))
     }
 
@@ -412,7 +414,9 @@ macro_rules! impl_integer_for_isize {
             /// Calculates the Lowest Common Multiple (LCM) of the number and
             /// `other`.
             #[inline]
-            fn lcm(&self, other: &Self) -> Self { self.gcd_lcm(other).1 }
+            fn lcm(&self, other: &Self) -> Self {
+                self.gcd_lcm(other).1
+            }
 
             /// Calculates the Greatest Common Divisor (GCD) and
             /// Lowest Common Multiple (LCM) of the number and `other`.
@@ -746,7 +750,9 @@ macro_rules! impl_integer_for_usize {
 
             /// Calculates the Lowest Common Multiple (LCM) of the number and `other`.
             #[inline]
-            fn lcm(&self, other: &Self) -> Self { self.gcd_lcm(other).1 }
+            fn lcm(&self, other: &Self) -> Self {
+                self.gcd_lcm(other).1
+            }
 
             /// Calculates the Greatest Common Divisor (GCD) and
             /// Lowest Common Multiple (LCM) of the number and `other`.
