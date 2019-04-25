@@ -21,6 +21,7 @@ extern crate std;
 
 extern crate num_traits as traits;
 
+use core::mem;
 use core::ops::Add;
 
 use traits::{Num, Signed, Zero};
@@ -119,6 +120,89 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// assert_eq!(0.lcm(&0), 0);
     /// ~~~
     fn lcm(&self, other: &Self) -> Self;
+
+    /// Greatest Common Divisor (GCD) and
+    /// Lowest Common Multiple (LCM) together.
+    ///
+    /// Potentially more efficient than calling `gcd` and `lcm`
+    /// individually for identical inputs.
+    ///
+    /// # Examples
+    ///
+    /// ~~~
+    /// # use num_integer::Integer;
+    /// assert_eq!(10.gcd_lcm(&4), (2, 20));
+    /// assert_eq!(8.gcd_lcm(&9), (1, 72));
+    /// ~~~
+    #[inline]
+    fn gcd_lcm(&self, other: &Self) -> (Self, Self) {
+        (self.gcd(other), self.lcm(other))
+    }
+
+    /// Greatest common divisor and Bézout coefficients.
+    ///
+    /// # Examples
+    ///
+    /// ~~~
+    /// # extern crate num_integer;
+    /// # extern crate num_traits;
+    /// # fn main() {
+    /// # use num_integer::{ExtendedGcd, Integer};
+    /// # use num_traits::NumAssign;
+    /// fn check<A: Copy + Integer + NumAssign>(a: A, b: A) -> bool {
+    ///     let ExtendedGcd { gcd, x, y, .. } = a.extended_gcd(&b);
+    ///     gcd == x * a + y * b
+    /// }
+    /// assert!(check(10isize, 4isize));
+    /// assert!(check(8isize,  9isize));
+    /// # }
+    /// ~~~
+    #[inline]
+    fn extended_gcd(&self, other: &Self) -> ExtendedGcd<Self>
+    where
+        Self: Clone,
+    {
+        let mut s = (Self::zero(), Self::one());
+        let mut t = (Self::one(), Self::zero());
+        let mut r = (other.clone(), self.clone());
+
+        while !r.0.is_zero() {
+            let q = r.1.clone() / r.0.clone();
+            let f = |mut r: (Self, Self)| {
+                mem::swap(&mut r.0, &mut r.1);
+                r.0 = r.0 - q.clone() * r.1.clone();
+                r
+            };
+            r = f(r);
+            s = f(s);
+            t = f(t);
+        }
+
+        if r.1 >= Self::zero() {
+            ExtendedGcd {
+                gcd: r.1,
+                x: s.1,
+                y: t.1,
+                _hidden: (),
+            }
+        } else {
+            ExtendedGcd {
+                gcd: Self::zero() - r.1,
+                x: Self::zero() - s.1,
+                y: Self::zero() - t.1,
+                _hidden: (),
+            }
+        }
+    }
+
+    /// Greatest common divisor, least common multiple, and Bézout coefficients.
+    #[inline]
+    fn extended_gcd_lcm(&self, other: &Self) -> (ExtendedGcd<Self>, Self)
+    where
+        Self: Clone + Signed,
+    {
+        (self.extended_gcd(other), self.lcm(other))
+    }
 
     /// Deprecated, use `is_multiple_of` instead.
     fn divides(&self, other: &Self) -> bool;
@@ -258,6 +342,20 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     }
 }
 
+/// Greatest common divisor and Bézout coefficients
+///
+/// ```no_build
+/// let e = isize::extended_gcd(a, b);
+/// assert_eq!(e.gcd, e.x*a + e.y*b);
+/// ```
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ExtendedGcd<A> {
+    pub gcd: A,
+    pub x: A,
+    pub y: A,
+    _hidden: (),
+}
+
 /// Simultaneous integer division and modulus
 #[inline]
 pub fn div_rem<T: Integer>(x: T, y: T) -> (T, T) {
@@ -294,6 +392,13 @@ pub fn gcd<T: Integer>(x: T, y: T) -> T {
 #[inline(always)]
 pub fn lcm<T: Integer>(x: T, y: T) -> T {
     x.lcm(&y)
+}
+
+/// Calculates the Greatest Common Divisor (GCD) and
+/// Lowest Common Multiple (LCM) of the number and `other`.
+#[inline(always)]
+pub fn gcd_lcm<T: Integer>(x: T, y: T) -> (T, T) {
+    x.gcd_lcm(&y)
 }
 
 macro_rules! impl_integer_for_isize {
@@ -394,16 +499,36 @@ macro_rules! impl_integer_for_isize {
                 m << shift
             }
 
+            #[inline]
+            fn extended_gcd_lcm(&self, other: &Self) -> (ExtendedGcd<Self>, Self) {
+                let egcd = self.extended_gcd(other);
+                // should not have to recalculate abs
+                let lcm = if egcd.gcd.is_zero() {
+                    Self::zero()
+                } else {
+                    (*self * (*other / egcd.gcd)).abs()
+                };
+                (egcd, lcm)
+            }
+
             /// Calculates the Lowest Common Multiple (LCM) of the number and
             /// `other`.
             #[inline]
             fn lcm(&self, other: &Self) -> Self {
+                self.gcd_lcm(other).1
+            }
+
+            /// Calculates the Greatest Common Divisor (GCD) and
+            /// Lowest Common Multiple (LCM) of the number and `other`.
+            #[inline]
+            fn gcd_lcm(&self, other: &Self) -> (Self, Self) {
                 if self.is_zero() && other.is_zero() {
-                    Self::zero()
-                } else {
-                    // should not have to recalculate abs
-                    (*self * (*other / self.gcd(other))).abs()
+                    return (Self::zero(), Self::zero());
                 }
+                let gcd = self.gcd(other);
+                // should not have to recalculate abs
+                let lcm = (*self * (*other / gcd)).abs();
+                (gcd, lcm)
             }
 
             /// Deprecated, use `is_multiple_of` instead.
@@ -589,6 +714,49 @@ macro_rules! impl_integer_for_isize {
             }
 
             #[test]
+            fn test_gcd_lcm() {
+                use core::iter::once;
+                for i in once(0)
+                    .chain((1..).take(127).flat_map(|a| once(a).chain(once(-a))))
+                    .chain(once(-128))
+                {
+                    for j in once(0)
+                        .chain((1..).take(127).flat_map(|a| once(a).chain(once(-a))))
+                        .chain(once(-128))
+                    {
+                        assert_eq!(i.gcd_lcm(&j), (i.gcd(&j), i.lcm(&j)));
+                    }
+                }
+            }
+
+            #[test]
+            fn test_extended_gcd_lcm() {
+                use core::fmt::Debug;
+                use traits::NumAssign;
+                use ExtendedGcd;
+
+                fn check<A: Copy + Debug + Integer + NumAssign>(a: A, b: A) {
+                    let ExtendedGcd { gcd, x, y, .. } = a.extended_gcd(&b);
+                    assert_eq!(gcd, x * a + y * b);
+                }
+
+                use core::iter::once;
+                for i in once(0)
+                    .chain((1..).take(127).flat_map(|a| once(a).chain(once(-a))))
+                    .chain(once(-128))
+                {
+                    for j in once(0)
+                        .chain((1..).take(127).flat_map(|a| once(a).chain(once(-a))))
+                        .chain(once(-128))
+                    {
+                        check(i, j);
+                        let (ExtendedGcd { gcd, .. }, lcm) = i.extended_gcd_lcm(&j);
+                        assert_eq!((gcd, lcm), (i.gcd(&j), i.lcm(&j)));
+                    }
+                }
+            }
+
+            #[test]
             fn test_even() {
                 assert_eq!((-4 as $T).is_even(), true);
                 assert_eq!((-3 as $T).is_even(), false);
@@ -674,14 +842,34 @@ macro_rules! impl_integer_for_usize {
                 m << shift
             }
 
+            #[inline]
+            fn extended_gcd_lcm(&self, other: &Self) -> (ExtendedGcd<Self>, Self) {
+                let egcd = self.extended_gcd(other);
+                // should not have to recalculate abs
+                let lcm = if egcd.gcd.is_zero() {
+                    Self::zero()
+                } else {
+                    *self * (*other / egcd.gcd)
+                };
+                (egcd, lcm)
+            }
+
             /// Calculates the Lowest Common Multiple (LCM) of the number and `other`.
             #[inline]
             fn lcm(&self, other: &Self) -> Self {
+                self.gcd_lcm(other).1
+            }
+
+            /// Calculates the Greatest Common Divisor (GCD) and
+            /// Lowest Common Multiple (LCM) of the number and `other`.
+            #[inline]
+            fn gcd_lcm(&self, other: &Self) -> (Self, Self) {
                 if self.is_zero() && other.is_zero() {
-                    Self::zero()
-                } else {
-                    *self * (*other / self.gcd(other))
+                    return (Self::zero(), Self::zero());
                 }
+                let gcd = self.gcd(other);
+                let lcm = *self * (*other / gcd);
+                (gcd, lcm)
             }
 
             /// Deprecated, use `is_multiple_of` instead.
@@ -775,6 +963,15 @@ macro_rules! impl_integer_for_usize {
                 assert_eq!((8 as $T).lcm(&9), 72 as $T);
                 assert_eq!((11 as $T).lcm(&5), 55 as $T);
                 assert_eq!((15 as $T).lcm(&17), 255 as $T);
+            }
+
+            #[test]
+            fn test_gcd_lcm() {
+                for i in (0..).take(256) {
+                    for j in (0..).take(256) {
+                        assert_eq!(i.gcd_lcm(&j), (i.gcd(&j), i.lcm(&j)));
+                    }
+                }
             }
 
             #[test]
