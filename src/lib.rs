@@ -631,12 +631,13 @@ macro_rules! impl_integer_for_isize {
 
             #[test]
             fn test_extended_gcd_lcm() {
+                use std::fmt::Debug;
                 use traits::NumAssign;
                 use ExtendedGcd;
 
-                fn check<A: Copy + Integer + NumAssign>(a: A, b: A) -> bool {
+                fn check<A: Copy + Debug + Integer + NumAssign>(a: A, b: A) {
                     let ExtendedGcd { gcd, x, y, .. } = a.extended_gcd(&b);
-                    gcd == x * a + y * b
+                    assert_eq!(gcd, x * a + y * b);
                 }
 
                 use core::iter::once;
