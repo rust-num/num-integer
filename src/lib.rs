@@ -145,7 +145,7 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
             let q = r.1.clone() / r.0.clone();
             let f = |mut r: (Self, Self)| {
                 mem::swap(&mut r.0, &mut r.1);
-                r.0 = r.0.clone() - q.clone() * r.1.clone();
+                r.0 = r.0 - q.clone() * r.1.clone();
                 r
             };
             r = f(r);
