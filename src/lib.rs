@@ -631,7 +631,7 @@ macro_rules! impl_integer_for_isize {
 
             #[test]
             fn test_extended_gcd_lcm() {
-                use std::fmt::Debug;
+                use core::fmt::Debug;
                 use traits::NumAssign;
                 use ExtendedGcd;
 
