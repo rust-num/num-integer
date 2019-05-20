@@ -1,3 +1,17 @@
+# Release 0.1.40 (2019-05-20)
+
+- [Optimized primitive `gcd` by avoiding memory swaps][11].
+- [Fixed `lcm(0, 0)` to return `0`, rather than panicking][18].
+- [Added `Integer::div_ceil`, `next_multiple_of`, and `prev_multiple_of`][16].
+- [Added `Integer::gcd_lcm`, `extended_gcd`, and `extended_gcd_lcm`][19].
+
+**Contributors**: @cuviper, @ignatenkobrain, @smarnach, @strake
+
+[11]: https://github.com/rust-num/num-integer/pull/11
+[16]: https://github.com/rust-num/num-integer/pull/16
+[18]: https://github.com/rust-num/num-integer/pull/18
+[19]: https://github.com/rust-num/num-integer/pull/19
+
 # Release 0.1.39 (2018-06-20)
 
 - [The new `Roots` trait provides `sqrt`, `cbrt`, and `nth_root` methods][9],
