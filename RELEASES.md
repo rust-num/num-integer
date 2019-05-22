@@ -1,3 +1,11 @@
+# Release 0.1.41 (2019-05-21)
+
+- [Fixed feature detection on `no_std` targets][25].
+
+**Contributors**: @cuviper
+
+[25]: https://github.com/rust-num/num-integer/pull/25
+
 # Release 0.1.40 (2019-05-20)
 
 - [Optimized primitive `gcd` by avoiding memory swaps][11].
