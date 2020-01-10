@@ -1,3 +1,11 @@
+# Release 0.1.42 (2020-01-09)
+
+- [Updated the `autocfg` build dependency to 1.0][29].
+
+**Contributors**: @cuviper, @dingelish
+
+[29]: https://github.com/rust-num/num-integer/pull/29
+
 # Release 0.1.41 (2019-05-21)
 
 - [Fixed feature detection on `no_std` targets][25].
