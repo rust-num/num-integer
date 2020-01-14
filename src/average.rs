@@ -63,12 +63,12 @@ where
 /// Returns the floor value of the average of `x` and `y` --
 /// see [Average::average_floor](trait.Average.html#tymethod.average_floor).
 #[inline]
-pub fn average_floor<T: Average>(x: &T, y: &T) -> T {
+pub fn average_floor<T: Average>(x: T, y: T) -> T {
     x.average_floor(y)
 }
 /// Returns the ceiling value of the average of `x` and `y` --
 /// see [Average::average_ceil](trait.Average.html#tymethod.average_ceil).
 #[inline]
-pub fn average_ceil<T: Average>(x: &T, y: &T) -> T {
+pub fn average_ceil<T: Average>(x: T, y: T) -> T {
     x.average_ceil(y)
 }

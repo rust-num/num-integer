@@ -84,10 +84,10 @@ macro_rules! unchecked_average {
     ($T:ident) => {
         impl super::UncheckedAverage for $T {
             fn unchecked_average_floor(&self, other: &$T) -> $T {
-                self.saturating_add(*other) / 2
+                self.wrapping_add(*other) / 2
             }
             fn unchecked_average_ceil(&self, other: &$T) -> $T {
-                self.saturating_add(*other) / 2
+                (self.wrapping_add(*other) / 2).wrapping_add(1)
             }
         }
     };
