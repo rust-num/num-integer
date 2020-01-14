@@ -1,4 +1,4 @@
-use core::ops::{Add, BitAnd, BitOr, BitXor, Shr, Sub};
+use core::ops::{BitAnd, BitOr, BitXor, Shr};
 use Integer;
 
 /// Provides methods to compute the average of two integers, without overflows.
@@ -40,7 +40,7 @@ pub trait Average: Integer {
 
 impl<I> Average for I
 where
-    I: Integer + Add<I, Output = I> + Sub<I, Output = I> + Shr<usize, Output = I>,
+    I: Integer + Shr<usize, Output = I>,
     for<'a, 'b> &'a I:
         BitAnd<&'b I, Output = I> + BitOr<&'b I, Output = I> + BitXor<&'b I, Output = I>,
 {
@@ -64,11 +64,11 @@ where
 /// see [Average::average_floor](trait.Average.html#tymethod.average_floor).
 #[inline]
 pub fn average_floor<T: Average>(x: T, y: T) -> T {
-    x.average_floor(y)
+    x.average_floor(&y)
 }
 /// Returns the ceiling value of the average of `x` and `y` --
 /// see [Average::average_ceil](trait.Average.html#tymethod.average_ceil).
 #[inline]
 pub fn average_ceil<T: Average>(x: T, y: T) -> T {
-    x.average_ceil(y)
+    x.average_ceil(&y)
 }
