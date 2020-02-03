@@ -6,10 +6,10 @@ extern crate num_integer;
 extern crate num_traits;
 extern crate test;
 
-use std::cmp::{min, max};
-use std::fmt::Debug;
 use num_integer::Integer;
 use num_traits::{AsPrimitive, PrimInt, WrappingAdd, WrappingMul};
+use std::cmp::{max, min};
+use std::fmt::Debug;
 use test::{black_box, Bencher};
 
 // --- Utilities for RNG ----------------------------------------------------
@@ -66,15 +66,15 @@ macro_rules! naive_average {
                 }
             }
             fn naive_average_ceil(&self, other: &$T) -> $T {
-                match self.checked_add(*other).and_then(|x| x.checked_add(1)) {
+                match self.checked_add(*other) {
                     Some(z) => z.div_ceil(&2),
                     None => {
                         if self > other {
                             let diff = self - other;
-                            self - diff / 2
+                            self - diff.div_floor(&2)
                         } else {
                             let diff = other - self;
-                            other - diff / 2
+                            other - diff.div_floor(&2)
                         }
                     }
                 }
@@ -102,7 +102,7 @@ macro_rules! modulo_average {
             fn modulo_average_ceil(&self, other: &$T) -> $T {
                 let (q1, r1) = self.div_mod_floor(&2);
                 let (q2, r2) = other.div_mod_floor(&2);
-                q1 + q2 + (r1 * r2)
+                q1 + q2 + (r1 | r2)
             }
             fn modulo_average_floor(&self, other: &$T) -> $T {
                 let (q1, r1) = self.div_mod_floor(&2);
@@ -135,10 +135,21 @@ where
     for &(i, j) in v {
         let rt = f(&i, &j);
         let (a, b) = (min(i, j), max(i, j));
-        if (b - a).is_even() {
-            assert_eq!(rt - a, b - rt);
+        println!("( {:?} + {:?} )/ 2 = {:?}", a, b, rt);
+        // if both number are the same sign, check rt is in the middle
+        if (a < T::zero()) == (b < T::zero()) {
+            if (b - a).is_even() {
+                assert_eq!(rt - a, b - rt);
+            } else {
+                assert_eq!(rt - a, b - rt + T::one());
+            }
+        // if both number have a different sign,
         } else {
-            assert_eq!(rt - a, b - rt + T::one());
+            if (a + b).is_even() {
+                assert_eq!(rt, (a + b) / (T::one() + T::one()))
+            } else {
+                assert_eq!(rt, (a + b + T::one()) / (T::one() + T::one()))
+            }
         }
     }
     bench_unchecked(b, v, f);
@@ -209,6 +220,99 @@ macro_rules! bench_average {
                     .into_iter()
                     .map(|(x, y)| (super::lcg(x), super::lcg(y)))
                     .collect()
+            }
+
+            mod ceil {
+
+                use super::*;
+
+                mod small {
+
+                    use super::*;
+
+                    #[bench]
+                    fn optimized(b: &mut Bencher) {
+                        let v = small();
+                        bench_ceil(b, &v, |x: &$T, y: &$T| x.average_ceil(y));
+                    }
+
+                    #[bench]
+                    fn naive(b: &mut Bencher) {
+                        let v = small();
+                        bench_ceil(b, &v, |x: &$T, y: &$T| x.naive_average_ceil(y));
+                    }
+
+                    #[bench]
+                    fn unchecked(b: &mut Bencher) {
+                        let v = small();
+                        bench_unchecked(b, &v, |x: &$T, y: &$T| x.unchecked_average_ceil(y));
+                    }
+
+                    #[bench]
+                    fn modulo(b: &mut Bencher) {
+                        let v = small();
+                        bench_ceil(b, &v, |x: &$T, y: &$T| x.modulo_average_ceil(y));
+                    }
+                }
+
+                mod overflowing {
+
+                    use super::*;
+
+                    #[bench]
+                    fn optimized(b: &mut Bencher) {
+                        let v = overflowing();
+                        bench_ceil(b, &v, |x: &$T, y: &$T| x.average_ceil(y));
+                    }
+
+                    #[bench]
+                    fn naive(b: &mut Bencher) {
+                        let v = overflowing();
+                        bench_ceil(b, &v, |x: &$T, y: &$T| x.naive_average_ceil(y));
+                    }
+
+                    #[bench]
+                    fn unchecked(b: &mut Bencher) {
+                        let v = overflowing();
+                        bench_unchecked(b, &v, |x: &$T, y: &$T| x.unchecked_average_ceil(y));
+                    }
+
+                    #[bench]
+                    fn modulo(b: &mut Bencher) {
+                        let v = overflowing();
+                        bench_ceil(b, &v, |x: &$T, y: &$T| x.modulo_average_ceil(y));
+                    }
+                }
+
+                mod rand {
+
+                    use super::*;
+
+                    #[bench]
+                    fn optimized(b: &mut Bencher) {
+                        let v = rand();
+                        bench_ceil(b, &v, |x: &$T, y: &$T| x.average_ceil(y));
+                    }
+
+                    #[bench]
+                    fn naive(b: &mut Bencher) {
+                        let v = rand();
+                        bench_ceil(b, &v, |x: &$T, y: &$T| x.naive_average_ceil(y));
+                    }
+
+                    #[bench]
+                    fn unchecked(b: &mut Bencher) {
+                        let v = rand();
+                        bench_unchecked(b, &v, |x: &$T, y: &$T| x.unchecked_average_ceil(y));
+                    }
+
+                    #[bench]
+                    fn modulo(b: &mut Bencher) {
+                        let v = rand();
+                        bench_ceil(b, &v, |x: &$T, y: &$T| x.modulo_average_ceil(y));
+                    }
+                }
+
             }
 
             mod floor {
