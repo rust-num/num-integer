@@ -135,7 +135,6 @@ where
     for &(i, j) in v {
         let rt = f(&i, &j);
         let (a, b) = (min(i, j), max(i, j));
-        println!("( {:?} + {:?} )/ 2 = {:?}", a, b, rt);
         // if both number are the same sign, check rt is in the middle
         if (a < T::zero()) == (b < T::zero()) {
             if (b - a).is_even() {
@@ -163,7 +162,6 @@ where
     for &(i, j) in v {
         let rt = f(&i, &j);
         let (a, b) = (min(i, j), max(i, j));
-        println!("{:?} + {:?} / 2 = {:?}", a, b, rt);
         // if both number are the same sign, check rt is in the middle
         if (a < T::zero()) == (b < T::zero()) {
             if (b - a).is_even() {
