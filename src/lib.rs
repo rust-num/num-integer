@@ -651,19 +651,11 @@ macro_rules! impl_integer_for_isize {
 
                 // gcd(-128, b) = 128 is not representable as positive value
                 // for i8
-                for i in -127..127 {
-                    for j in -127..127 {
+                for i in -127..=127 {
+                    for j in -127..=127 {
                         assert_eq!(euclidean_gcd(i, j), i.gcd(&j));
                     }
                 }
-
-                // last value
-                // FIXME: Use inclusive ranges for above loop when implemented
-                let i = 127;
-                for j in -127..127 {
-                    assert_eq!(euclidean_gcd(i, j), i.gcd(&j));
-                }
-                assert_eq!(127.gcd(&127), 127);
             }
 
             #[test]
@@ -939,19 +931,11 @@ macro_rules! impl_integer_for_usize {
                     n
                 }
 
-                for i in 0..255 {
-                    for j in 0..255 {
+                for i in 0..=255 {
+                    for j in 0..=255 {
                         assert_eq!(euclidean_gcd(i, j), i.gcd(&j));
                     }
                 }
-
-                // last value
-                // FIXME: Use inclusive ranges for above loop when implemented
-                let i = 255;
-                for j in 0..255 {
-                    assert_eq!(euclidean_gcd(i, j), i.gcd(&j));
-                }
-                assert_eq!(255.gcd(&255), 255);
             }
 
             #[test]
