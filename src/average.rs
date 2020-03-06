@@ -16,6 +16,8 @@ pub trait Average: Integer {
     /// assert_eq!(( 4).average_ceil(& 4),  4);
     ///
     /// assert_eq!(u8::max_value().average_ceil(&2), 129);
+    /// assert_eq!(i8::min_value().average_ceil(&-1), -64);
+    /// assert_eq!(i8::min_value().average_ceil(&i8::max_value()), 0);
     /// ```
     ///
     fn average_ceil(&self, other: &Self) -> Self;
@@ -33,6 +35,8 @@ pub trait Average: Integer {
     /// assert_eq!(( 4).average_floor(& 4),  4);
     ///
     /// assert_eq!(u8::max_value().average_floor(&2), 128);
+    /// assert_eq!(i8::min_value().average_floor(&-1), -65);
+    /// assert_eq!(i8::min_value().average_floor(&i8::max_value()), -1);
     /// ```
     ///
     fn average_floor(&self, other: &Self) -> Self;
