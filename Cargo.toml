@@ -11,7 +11,7 @@ name = "num-integer"
 version = "0.1.42"
 readme = "README.md"
 build = "build.rs"
-exclude = ["/ci/*", "/.travis.yml", "/bors.toml"]
+exclude = ["/bors.toml", "/ci/*", "/.github/*"]
 
 [package.metadata.docs.rs]
 features = ["std"]
