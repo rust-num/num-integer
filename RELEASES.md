@@ -1,3 +1,12 @@
+# Release 0.1.43 (2020-06-11)
+
+- [The new `Average` trait][31] computes fast integer averages, rounded up or
+  down, without any risk of overflow.
+
+**Contributors**: @althonos, @cuviper
+
+[31]: https://github.com/rust-num/num-integer/pull/31
+
 # Release 0.1.42 (2020-01-09)
 
 - [Updated the `autocfg` build dependency to 1.0][29].
