@@ -21,9 +21,9 @@ extern crate std;
 
 extern crate num_traits as traits;
 
+use core::cmp::Ordering;
 use core::mem;
 use core::ops::{Add, Neg, Shr};
-use core::cmp::Ordering;
 
 use traits::{Num, NumRef, RefNum, Signed, Zero};
 
@@ -1019,14 +1019,16 @@ pub struct GcdResult<T> {
     /// Greatest common divisor.
     pub gcd: T,
     /// Coefficients such that: gcd(a, b) = c1*a + c2*b
-    pub c1: T, pub c2: T,
+    pub c1: T,
+    pub c2: T,
     /// Dummy field to make sure adding new fields is not a breaking change.
     seal: (),
 }
 
 /// Calculate greatest common divisor and the corresponding coefficients.
 pub fn extended_gcd<T: Integer + NumRef>(a: T, b: T) -> GcdResult<T>
-    where for<'a> &'a T: RefNum<T>
+where
+    for<'a> &'a T: RefNum<T>,
 {
     // Euclid's extended algorithm
     let (mut s, mut old_s) = (T::zero(), T::one());
@@ -1035,14 +1037,22 @@ pub fn extended_gcd<T: Integer + NumRef>(a: T, b: T) -> GcdResult<T>
 
     while r != T::zero() {
         let quotient = &old_r / &r;
-        old_r = old_r - &quotient * &r; mem::swap(&mut old_r, &mut r);
-        old_s = old_s - &quotient * &s; mem::swap(&mut old_s, &mut s);
-        old_t = old_t - quotient * &t; mem::swap(&mut old_t, &mut t);
+        old_r = old_r - &quotient * &r;
+        mem::swap(&mut old_r, &mut r);
+        old_s = old_s - &quotient * &s;
+        mem::swap(&mut old_s, &mut s);
+        old_t = old_t - quotient * &t;
+        mem::swap(&mut old_t, &mut t);
     }
 
     let _quotients = (t, s); // == (a, b) / gcd
 
-    GcdResult { gcd: old_r, c1: old_s, c2: old_t, seal: () }
+    GcdResult {
+        gcd: old_r,
+        c1: old_s,
+        c2: old_t,
+        seal: (),
+    }
 }
 
 /// Find the standard representation of a (mod n).
@@ -1056,7 +1066,8 @@ pub fn normalize<T: Integer + NumRef>(a: T, n: &T) -> T {
 
 /// Calculate the inverse of a (mod n).
 pub fn inverse<T: Integer + NumRef + Clone>(a: T, n: &T) -> Option<T>
-    where for<'a> &'a T: RefNum<T>
+where
+    for<'a> &'a T: RefNum<T>,
 {
     let GcdResult { gcd, c1: c, .. } = extended_gcd(a, n.clone());
     if gcd == T::one() {
@@ -1068,8 +1079,9 @@ pub fn inverse<T: Integer + NumRef + Clone>(a: T, n: &T) -> Option<T>
 
 /// Calculate base^exp (mod modulus).
 pub fn powm<T>(base: &T, exp: &T, modulus: &T) -> T
-    where T: Integer + NumRef + Clone + Neg<Output = T> + Shr<i32, Output = T>,
-          for<'a> &'a T: RefNum<T>
+where
+    T: Integer + NumRef + Clone + Neg<Output = T> + Shr<i32, Output = T>,
+    for<'a> &'a T: RefNum<T>,
 {
     let zero = T::zero();
     let one = T::one();
@@ -1249,7 +1261,15 @@ fn test_lcm_overflow() {
 
 #[test]
 fn test_extended_gcd() {
-    assert_eq!(extended_gcd(240, 46), GcdResult { gcd: 2, c1: -9, c2: 47, seal: () });
+    assert_eq!(
+        extended_gcd(240, 46),
+        GcdResult {
+            gcd: 2,
+            c1: -9,
+            c2: 47,
+            seal: ()
+        }
+    );
 }
 
 #[test]
