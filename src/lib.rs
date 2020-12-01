@@ -34,6 +34,9 @@ mod average;
 pub use average::Average;
 pub use average::{average_ceil, average_floor};
 
+mod power;
+pub use power::Power;
+
 pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// Floored integer division.
     ///
