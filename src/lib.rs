@@ -1020,6 +1020,8 @@ pub struct GcdResult<T> {
     pub gcd: T,
     /// Coefficients such that: gcd(a, b) = c1*a + c2*b
     pub c1: T, pub c2: T,
+    /// Dummy field to make sure adding new fields is not a breaking change.
+    seal: (),
 }
 
 /// Calculate greatest common divisor and the corresponding coefficients.
@@ -1040,7 +1042,7 @@ pub fn extended_gcd<T: Integer + NumRef>(a: T, b: T) -> GcdResult<T>
 
     let _quotients = (t, s); // == (a, b) / gcd
 
-    GcdResult { gcd: old_r, c1: old_s, c2: old_t }
+    GcdResult { gcd: old_r, c1: old_s, c2: old_t, seal: () }
 }
 
 /// Find the standard representation of a (mod n).
@@ -1247,7 +1249,7 @@ fn test_lcm_overflow() {
 
 #[test]
 fn test_extended_gcd() {
-    assert_eq!(extended_gcd(240, 46), GcdResult { gcd: 2, c1: -9, c2: 47});
+    assert_eq!(extended_gcd(240, 46), GcdResult { gcd: 2, c1: -9, c2: 47, seal: () });
 }
 
 #[test]
