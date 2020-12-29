@@ -208,6 +208,21 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
         (self.extended_gcd(other), self.lcm(other))
     }
 
+    /// Inverse of the number modulo the modulus
+    #[inline]
+    fn invmod(&self, modulus: &Self) -> Self
+    where
+        Self: Clone,
+    {
+        let egcd = self.extended_gcd(modulus);
+        assert!(egcd.gcd.is_one(), "no inverse, GCD(x, modulus) != 1");
+        if egcd.x < Self::zero() {
+            egcd.x + modulus.clone()
+        } else {
+            egcd.x
+        }
+    }
+
     /// Deprecated, use `is_multiple_of` instead.
     fn divides(&self, other: &Self) -> bool;
 
