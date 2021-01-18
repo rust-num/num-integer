@@ -209,17 +209,29 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     }
 
     /// Inverse of the number modulo the modulus
+    ///
+    /// # Examples
+    ///
+    /// ~~~
+    /// # extern crate num_integer;
+    /// # fn main() {
+    /// # use num_integer::Integer;
+    /// assert_eq!((10isize).invmod(&11isize).unwrap(), 10isize);
+    /// assert_eq!((173isize).invmod(&1729isize).unwrap(), 10isize);
+    /// # }
+    /// ~~~
     #[inline]
-    fn invmod(&self, modulus: &Self) -> Self
+    fn invmod(&self, modulus: &Self) -> Option<Self>
     where
         Self: Clone,
     {
-        let egcd = self.extended_gcd(modulus);
-        assert!(egcd.gcd.is_one(), "no inverse, GCD(x, modulus) != 1");
-        if egcd.x < Self::zero() {
-            egcd.x + modulus.clone()
+        let ExtendedGcd { gcd, x, .. } = self.extended_gcd(modulus);
+        if !gcd.is_one() {
+            None
+        } else if x < Self::zero() {
+            Some(x + modulus.clone())
         } else {
-            egcd.x
+            Some(x)
         }
     }
 
@@ -1355,4 +1367,12 @@ fn test_multinomial() {
     check_multinomial!(u64, &[], 1);
     check_multinomial!(u64, &[0], 1);
     check_multinomial!(u64, &[12345], 1);
+}
+
+#[test]
+fn test_invmod() {
+    assert_eq!((10isize).invmod(&11isize).unwrap(), 10isize);
+    assert_eq!((173isize).invmod(&1729isize).unwrap(), 10isize);
+
+    assert!((10isize).invmod(&12isize).is_none());
 }
