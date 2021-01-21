@@ -351,7 +351,7 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
 /// let e = isize::extended_gcd(a, b);
 /// assert_eq!(e.gcd, e.x*a + e.y*b);
 /// ```
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct ExtendedGcd<A> {
     pub gcd: A,
     pub x: A,
