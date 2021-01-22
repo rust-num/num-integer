@@ -1014,19 +1014,8 @@ impl_integer_for_usize!(usize, test_integer_usize);
 #[cfg(has_i128)]
 impl_integer_for_usize!(u128, test_integer_u128);
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub struct GcdResult<T> {
-    /// Greatest common divisor.
-    pub gcd: T,
-    /// Coefficients such that: gcd(a, b) = c1*a + c2*b
-    pub c1: T,
-    pub c2: T,
-    /// Dummy field to make sure adding new fields is not a breaking change.
-    seal: (),
-}
-
 /// Calculate greatest common divisor and the corresponding coefficients.
-pub fn extended_gcd<T: Integer + NumRef>(a: T, b: T) -> GcdResult<T>
+pub fn extended_gcd<T: Integer + NumRef>(a: T, b: T) -> ExtendedGcd<T>
 where
     for<'a> &'a T: RefNum<T>,
 {
@@ -1047,11 +1036,11 @@ where
 
     let _quotients = (t, s); // == (a, b) / gcd
 
-    GcdResult {
+    ExtendedGcd {
         gcd: old_r,
-        c1: old_s,
-        c2: old_t,
-        seal: (),
+        x: old_s,
+        y: old_t,
+        _hidden: (),
     }
 }
 
@@ -1069,7 +1058,7 @@ pub fn inverse<T: Integer + NumRef + Clone>(a: T, n: &T) -> Option<T>
 where
     for<'a> &'a T: RefNum<T>,
 {
-    let GcdResult { gcd, c1: c, .. } = extended_gcd(a, n.clone());
+    let ExtendedGcd { gcd, x: c, .. } = extended_gcd(a, n.clone());
     if gcd == T::one() {
         Some(normalize(c, n))
     } else {
@@ -1263,11 +1252,11 @@ fn test_lcm_overflow() {
 fn test_extended_gcd() {
     assert_eq!(
         extended_gcd(240, 46),
-        GcdResult {
+        ExtendedGcd {
             gcd: 2,
-            c1: -9,
-            c2: 47,
-            seal: ()
+            x: -9,
+            y: 47,
+            _hidden: ()
         }
     );
 }
