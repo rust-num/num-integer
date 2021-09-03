@@ -609,8 +609,9 @@ macro_rules! impl_integer_for_isize {
             fn test_div_mod_floor() {
                 fn test_nd_dm(nd: ($T, $T), dm: ($T, $T)) {
                     let (n, d) = nd;
-                    let separate_div_mod_floor = (n.div_floor(&d), n.mod_floor(&d));
-                    let combined_div_mod_floor = n.div_mod_floor(&d);
+                    let separate_div_mod_floor =
+                        (Integer::div_floor(&n, &d), Integer::mod_floor(&n, &d));
+                    let combined_div_mod_floor = Integer::div_mod_floor(&n, &d);
 
                     assert_eq!(separate_div_mod_floor, dm);
                     assert_eq!(combined_div_mod_floor, dm);
@@ -913,15 +914,16 @@ macro_rules! impl_integer_for_usize {
 
             #[test]
             fn test_div_mod_floor() {
-                assert_eq!((10 as $T).div_floor(&(3 as $T)), 3 as $T);
-                assert_eq!((10 as $T).mod_floor(&(3 as $T)), 1 as $T);
-                assert_eq!((10 as $T).div_mod_floor(&(3 as $T)), (3 as $T, 1 as $T));
-                assert_eq!((5 as $T).div_floor(&(5 as $T)), 1 as $T);
-                assert_eq!((5 as $T).mod_floor(&(5 as $T)), 0 as $T);
-                assert_eq!((5 as $T).div_mod_floor(&(5 as $T)), (1 as $T, 0 as $T));
-                assert_eq!((3 as $T).div_floor(&(7 as $T)), 0 as $T);
-                assert_eq!((3 as $T).mod_floor(&(7 as $T)), 3 as $T);
-                assert_eq!((3 as $T).div_mod_floor(&(7 as $T)), (0 as $T, 3 as $T));
+                assert_eq!(<$T as Integer>::div_floor(&10, &3), 3 as $T);
+                assert_eq!(<$T as Integer>::mod_floor(&10, &3), 1 as $T);
+                assert_eq!(<$T as Integer>::div_mod_floor(&10, &3), (3 as $T, 1 as $T));
+                assert_eq!(<$T as Integer>::div_floor(&5, &5), 1 as $T);
+                assert_eq!(<$T as Integer>::mod_floor(&5, &5), 0 as $T);
+                assert_eq!(<$T as Integer>::div_mod_floor(&5, &5), (1 as $T, 0 as $T));
+                assert_eq!(<$T as Integer>::div_floor(&3, &7), 0 as $T);
+                assert_eq!(<$T as Integer>::div_floor(&3, &7), 0 as $T);
+                assert_eq!(<$T as Integer>::mod_floor(&3, &7), 3 as $T);
+                assert_eq!(<$T as Integer>::div_mod_floor(&3, &7), (0 as $T, 3 as $T));
             }
 
             #[test]
