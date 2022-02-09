@@ -543,6 +543,9 @@ macro_rules! impl_integer_for_isize {
             /// Returns `true` if the number is a multiple of `other`.
             #[inline]
             fn is_multiple_of(&self, other: &Self) -> bool {
+                if other.is_zero() {
+                    return self.is_zero();
+                }
                 *self % *other == 0
             }
 
@@ -885,6 +888,9 @@ macro_rules! impl_integer_for_usize {
             /// Returns `true` if the number is a multiple of `other`.
             #[inline]
             fn is_multiple_of(&self, other: &Self) -> bool {
+                if other.is_zero() {
+                    return self.is_zero();
+                }
                 *self % *other == 0
             }
 
@@ -981,6 +987,7 @@ macro_rules! impl_integer_for_usize {
 
             #[test]
             fn test_is_multiple_of() {
+                assert!((0 as $T).is_multiple_of(&(0 as $T)));
                 assert!((6 as $T).is_multiple_of(&(6 as $T)));
                 assert!((6 as $T).is_multiple_of(&(3 as $T)));
                 assert!((6 as $T).is_multiple_of(&(1 as $T)));
