@@ -386,7 +386,7 @@ pub fn div_ceil<T: Integer>(x: T, y: T) -> T {
 }
 
 /// Calculates the Greatest Common Divisor (GCD) of the number and `other`. The
-/// result is always positive.
+/// result is always non-negative.
 #[inline(always)]
 pub fn gcd<T: Integer>(x: T, y: T) -> T {
     x.gcd(&y)
@@ -457,7 +457,7 @@ macro_rules! impl_integer_for_isize {
             }
 
             /// Calculates the Greatest Common Divisor (GCD) of the number and
-            /// `other`. The result is always positive.
+            /// `other`. The result is always non-negative.
             #[inline]
             fn gcd(&self, other: &Self) -> Self {
                 // Use Stein's algorithm
