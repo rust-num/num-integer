@@ -187,14 +187,12 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
                 gcd: r.1,
                 x: s.1,
                 y: t.1,
-                _hidden: (),
             }
         } else {
             ExtendedGcd {
                 gcd: Self::zero() - r.1,
                 x: Self::zero() - s.1,
                 y: Self::zero() - t.1,
-                _hidden: (),
             }
         }
     }
@@ -356,7 +354,6 @@ pub struct ExtendedGcd<A> {
     pub gcd: A,
     pub x: A,
     pub y: A,
-    _hidden: (),
 }
 
 /// Simultaneous integer division and modulus
