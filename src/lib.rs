@@ -560,6 +560,29 @@ macro_rules! impl_integer_for_isize {
             fn div_rem(&self, other: &Self) -> (Self, Self) {
                 (*self / *other, *self % *other)
             }
+
+            /// Rounds up to nearest multiple of argument.
+            #[inline]
+            fn next_multiple_of(&self, other: &Self) -> Self {
+                // Avoid the overflow of `MIN % -1`
+                if *other == -1 {
+                    return *self;
+                }
+
+                let m = Integer::mod_floor(self, other);
+                *self + if m == 0 { 0 } else { other - m }
+            }
+
+            /// Rounds down to nearest multiple of argument.
+            #[inline]
+            fn prev_multiple_of(&self, other: &Self) -> Self {
+                // Avoid the overflow of `MIN % -1`
+                if *other == -1 {
+                    return *self;
+                }
+
+                *self - Integer::mod_floor(self, other)
+            }
         }
 
         #[cfg(test)]
@@ -781,6 +804,16 @@ macro_rules! impl_integer_for_isize {
                 assert_eq!((2 as $T).is_odd(), false);
                 assert_eq!((3 as $T).is_odd(), true);
                 assert_eq!((4 as $T).is_odd(), false);
+            }
+
+            #[test]
+            fn test_multiple_of_one_limits() {
+                for x in &[<$T>::min_value(), <$T>::max_value()] {
+                    for one in &[1, -1] {
+                        assert_eq!(Integer::next_multiple_of(x, one), *x);
+                        assert_eq!(Integer::prev_multiple_of(x, one), *x);
+                    }
+                }
             }
         }
     };
