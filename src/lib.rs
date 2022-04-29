@@ -992,7 +992,6 @@ macro_rules! impl_integer_for_usize {
                 assert!((6 as $T).is_multiple_of(&(3 as $T)));
                 assert!((6 as $T).is_multiple_of(&(1 as $T)));
 
-
                 assert!(!(42 as $T).is_multiple_of(&(5 as $T)));
                 assert!(!(5 as $T).is_multiple_of(&(3 as $T)));
                 assert!(!(42 as $T).is_multiple_of(&(0 as $T)));
