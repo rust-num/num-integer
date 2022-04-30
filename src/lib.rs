@@ -21,10 +21,11 @@ extern crate std;
 
 extern crate num_traits as traits;
 
+use core::cmp::Ordering;
 use core::mem;
-use core::ops::Add;
+use core::ops::{Add, Neg, Shr};
 
-use traits::{Num, Signed, Zero};
+use traits::{Num, NumRef, RefNum, Signed, Zero};
 
 mod roots;
 pub use roots::Roots;
@@ -1056,6 +1057,84 @@ impl_integer_for_usize!(usize, test_integer_usize);
 #[cfg(has_i128)]
 impl_integer_for_usize!(u128, test_integer_u128);
 
+/// Calculate greatest common divisor and the corresponding coefficients.
+pub fn extended_gcd<T: Integer + NumRef>(a: T, b: T) -> ExtendedGcd<T>
+where
+    for<'a> &'a T: RefNum<T>,
+{
+    // Euclid's extended algorithm
+    let (mut s, mut old_s) = (T::zero(), T::one());
+    let (mut t, mut old_t) = (T::one(), T::zero());
+    let (mut r, mut old_r) = (b, a);
+
+    while r != T::zero() {
+        let quotient = &old_r / &r;
+        old_r = old_r - &quotient * &r;
+        mem::swap(&mut old_r, &mut r);
+        old_s = old_s - &quotient * &s;
+        mem::swap(&mut old_s, &mut s);
+        old_t = old_t - quotient * &t;
+        mem::swap(&mut old_t, &mut t);
+    }
+
+    let _quotients = (t, s); // == (a, b) / gcd
+
+    ExtendedGcd {
+        gcd: old_r,
+        x: old_s,
+        y: old_t,
+        _hidden: (),
+    }
+}
+
+/// Find the standard representation of a (mod n).
+pub fn normalize<T: Integer + NumRef>(a: T, n: &T) -> T {
+    let a = a % n;
+    match a.cmp(&T::zero()) {
+        Ordering::Less => a + n,
+        _ => a,
+    }
+}
+
+/// Calculate the inverse of a (mod n).
+pub fn inverse<T: Integer + NumRef + Clone>(a: T, n: &T) -> Option<T>
+where
+    for<'a> &'a T: RefNum<T>,
+{
+    let ExtendedGcd { gcd, x: c, .. } = extended_gcd(a, n.clone());
+    if gcd == T::one() {
+        Some(normalize(c, n))
+    } else {
+        None
+    }
+}
+
+/// Calculate base^exp (mod modulus).
+pub fn powm<T>(base: &T, exp: &T, modulus: &T) -> T
+where
+    T: Integer + NumRef + Clone + Neg<Output = T> + Shr<i32, Output = T>,
+    for<'a> &'a T: RefNum<T>,
+{
+    let zero = T::zero();
+    let one = T::one();
+    let two = &one + &one;
+    let mut exp = exp.clone();
+    let mut result = one.clone();
+    let mut base = base % modulus;
+    if exp < zero {
+        exp = -exp;
+        base = inverse(base, modulus).unwrap();
+    }
+    while exp > zero {
+        if &exp % &two == one {
+            result = (result * &base) % modulus;
+        }
+        exp = exp >> 1;
+        base = (&base * &base) % modulus;
+    }
+    result
+}
+
 /// An iterator over binomial coefficients.
 pub struct IterBinomial<T> {
     a: T,
@@ -1210,6 +1289,38 @@ fn test_lcm_overflow() {
     check!(u32, 0x8000_0000, 0x02, 0x8000_0000);
     check!(i64, 0x4000_0000_0000_0000, 0x04, 0x4000_0000_0000_0000);
     check!(u64, 0x8000_0000_0000_0000, 0x02, 0x8000_0000_0000_0000);
+}
+
+#[test]
+fn test_extended_gcd() {
+    assert_eq!(
+        extended_gcd(240, 46),
+        ExtendedGcd {
+            gcd: 2,
+            x: -9,
+            y: 47,
+            _hidden: ()
+        }
+    );
+}
+
+#[test]
+fn test_normalize() {
+    assert_eq!(normalize(10, &7), 3);
+    assert_eq!(normalize(7, &7), 0);
+    assert_eq!(normalize(5, &7), 5);
+    assert_eq!(normalize(-3, &7), 4);
+}
+
+#[test]
+fn test_inverse() {
+    assert_eq!(inverse(5, &7).unwrap(), 3);
+}
+
+#[test]
+fn test_powm() {
+    // `i64::pow` would overflow.
+    assert_eq!(powm(&11, &19, &7), 4);
 }
 
 #[test]
