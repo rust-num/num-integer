@@ -1065,7 +1065,7 @@ where
         IterBinomial {
             k: T::zero(),
             a: T::one(),
-            n: n,
+            n,
         }
     }
 }
