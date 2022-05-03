@@ -10,7 +10,6 @@ repository = "https://github.com/rust-num/num-integer"
 name = "num-integer"
 version = "0.1.45"
 readme = "README.md"
-build = "build.rs"
 exclude = ["/bors.toml", "/ci/*", "/.github/*"]
 edition = "2018"
 rust-version = "1.31"
@@ -21,11 +20,11 @@ features = ["std"]
 [dependencies.num-traits]
 version = "0.2.11"
 default-features = false
+features = ["i128"]
 
 [features]
 default = ["std"]
-i128 = ["num-traits/i128"]
 std = ["num-traits/std"]
 
-[build-dependencies]
-autocfg = "1"
+# vestigial features, now always in effect
+i128 = []

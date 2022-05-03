@@ -826,9 +826,8 @@ impl_integer_for_isize!(i8, test_integer_i8);
 impl_integer_for_isize!(i16, test_integer_i16);
 impl_integer_for_isize!(i32, test_integer_i32);
 impl_integer_for_isize!(i64, test_integer_i64);
-impl_integer_for_isize!(isize, test_integer_isize);
-#[cfg(has_i128)]
 impl_integer_for_isize!(i128, test_integer_i128);
+impl_integer_for_isize!(isize, test_integer_isize);
 
 macro_rules! impl_integer_for_usize {
     ($T:ty, $test_mod:ident) => {
@@ -1052,9 +1051,8 @@ impl_integer_for_usize!(u8, test_integer_u8);
 impl_integer_for_usize!(u16, test_integer_u16);
 impl_integer_for_usize!(u32, test_integer_u32);
 impl_integer_for_usize!(u64, test_integer_u64);
-impl_integer_for_usize!(usize, test_integer_usize);
-#[cfg(has_i128)]
 impl_integer_for_usize!(u128, test_integer_u128);
+impl_integer_for_usize!(usize, test_integer_usize);
 
 /// An iterator over binomial coefficients.
 pub struct IterBinomial<T> {

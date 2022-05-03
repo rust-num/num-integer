@@ -92,6 +92,5 @@ test_average!(i8, u8);
 test_average!(i16, u16);
 test_average!(i32, u32);
 test_average!(i64, u64);
-#[cfg(has_i128)]
 test_average!(i128, u128);
 test_average!(isize, usize);

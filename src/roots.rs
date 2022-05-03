@@ -165,7 +165,6 @@ signed_roots!(i8, u8);
 signed_roots!(i16, u16);
 signed_roots!(i32, u32);
 signed_roots!(i64, u64);
-#[cfg(has_i128)]
 signed_roots!(i128, u128);
 signed_roots!(isize, usize);
 
@@ -385,6 +384,5 @@ unsigned_roots!(u8);
 unsigned_roots!(u16);
 unsigned_roots!(u32);
 unsigned_roots!(u64);
-#[cfg(has_i128)]
 unsigned_roots!(u128);
 unsigned_roots!(usize);

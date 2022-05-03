@@ -264,6 +264,5 @@ test_roots!(i8, u8);
 test_roots!(i16, u16);
 test_roots!(i32, u32);
 test_roots!(i64, u64);
-#[cfg(has_i128)]
 test_roots!(i128, u128);
 test_roots!(isize, usize);
