@@ -12,7 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        rust: [1.31.0, stable, beta, nightly]
+        rust: [
+          1.31.0, # MSRV
+          stable,
+          beta,
+          nightly,
+        ]
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@master
