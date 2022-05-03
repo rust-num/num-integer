@@ -1,8 +1,7 @@
-use core;
+use crate::traits::checked_pow;
+use crate::traits::PrimInt;
+use crate::Integer;
 use core::mem;
-use traits::checked_pow;
-use traits::PrimInt;
-use Integer;
 
 /// Provides methods to compute an integer's square root, cube root,
 /// and arbitrary `n`th root.

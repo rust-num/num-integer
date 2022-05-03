@@ -24,15 +24,15 @@ extern crate num_traits as traits;
 use core::mem;
 use core::ops::Add;
 
-use traits::{Num, Signed, Zero};
+use crate::traits::{Num, Signed, Zero};
 
 mod roots;
-pub use roots::Roots;
-pub use roots::{cbrt, nth_root, sqrt};
+pub use crate::roots::Roots;
+pub use crate::roots::{cbrt, nth_root, sqrt};
 
 mod average;
-pub use average::Average;
-pub use average::{average_ceil, average_floor};
+pub use crate::average::Average;
+pub use crate::average::{average_ceil, average_floor};
 
 pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// Floored integer division.
@@ -590,8 +590,8 @@ macro_rules! impl_integer_for_isize {
 
         #[cfg(test)]
         mod $test_mod {
+            use crate::Integer;
             use core::mem;
-            use Integer;
 
             /// Checks that the division rule holds for:
             ///
@@ -758,9 +758,9 @@ macro_rules! impl_integer_for_isize {
 
             #[test]
             fn test_extended_gcd_lcm() {
+                use crate::traits::NumAssign;
+                use crate::ExtendedGcd;
                 use core::fmt::Debug;
-                use traits::NumAssign;
-                use ExtendedGcd;
 
                 fn check<A: Copy + Debug + Integer + NumAssign>(a: A, b: A) {
                     let ExtendedGcd { gcd, x, y, .. } = a.extended_gcd(&b);
@@ -945,8 +945,8 @@ macro_rules! impl_integer_for_usize {
 
         #[cfg(test)]
         mod $test_mod {
+            use crate::Integer;
             use core::mem;
-            use Integer;
 
             #[test]
             fn test_div_mod_floor() {

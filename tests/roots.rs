@@ -1,6 +1,3 @@
-extern crate num_integer;
-extern crate num_traits;
-
 use num_integer::Roots;
 use num_traits::checked_pow;
 use num_traits::{AsPrimitive, PrimInt, Signed};
@@ -161,10 +158,10 @@ where
 macro_rules! test_roots {
     ($I:ident, $U:ident) => {
         mod $I {
-            use check;
-            use neg;
+            use crate::check;
+            use crate::neg;
+            use crate::pos;
             use num_integer::Roots;
-            use pos;
             use std::mem;
 
             #[test]
@@ -223,9 +220,9 @@ macro_rules! test_roots {
         }
 
         mod $U {
-            use check;
+            use crate::check;
+            use crate::pos;
             use num_integer::Roots;
-            use pos;
             use std::mem;
 
             #[test]
