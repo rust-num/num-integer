@@ -141,12 +141,10 @@ where
                 assert_eq!(rt - a, b - rt + T::one());
             }
         // if both number have a different sign,
+        } else if (a + b).is_even() {
+            assert_eq!(rt, (a + b) / (T::one() + T::one()))
         } else {
-            if (a + b).is_even() {
-                assert_eq!(rt, (a + b) / (T::one() + T::one()))
-            } else {
-                assert_eq!(rt, (a + b + T::one()) / (T::one() + T::one()))
-            }
+            assert_eq!(rt, (a + b + T::one()) / (T::one() + T::one()))
         }
     }
     bench_unchecked(b, v, f);
@@ -168,12 +166,10 @@ where
                 assert_eq!(rt - a + T::one(), b - rt);
             }
         // if both number have a different sign,
+        } else if (a + b).is_even() {
+            assert_eq!(rt, (a + b) / (T::one() + T::one()))
         } else {
-            if (a + b).is_even() {
-                assert_eq!(rt, (a + b) / (T::one() + T::one()))
-            } else {
-                assert_eq!(rt, (a + b - T::one()) / (T::one() + T::one()))
-            }
+            assert_eq!(rt, (a + b - T::one()) / (T::one() + T::one()))
         }
     }
     bench_unchecked(b, v, f);
