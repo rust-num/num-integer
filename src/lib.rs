@@ -16,15 +16,11 @@
 
 #![doc(html_root_url = "https://docs.rs/num-integer/0.1")]
 #![no_std]
-#[cfg(feature = "std")]
-extern crate std;
-
-extern crate num_traits as traits;
 
 use core::mem;
 use core::ops::Add;
 
-use crate::traits::{Num, Signed, Zero};
+use num_traits::{Num, Signed, Zero};
 
 mod roots;
 pub use crate::roots::Roots;
@@ -148,8 +144,6 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// # Examples
     ///
     /// ~~~
-    /// # extern crate num_integer;
-    /// # extern crate num_traits;
     /// # fn main() {
     /// # use num_integer::{ExtendedGcd, Integer};
     /// # use num_traits::NumAssign;
@@ -758,9 +752,9 @@ macro_rules! impl_integer_for_isize {
 
             #[test]
             fn test_extended_gcd_lcm() {
-                use crate::traits::NumAssign;
                 use crate::ExtendedGcd;
                 use core::fmt::Debug;
+                use num_traits::NumAssign;
 
                 fn check<A: Copy + Debug + Integer + NumAssign>(a: A, b: A) {
                     let ExtendedGcd { gcd, x, y, .. } = a.extended_gcd(&b);
