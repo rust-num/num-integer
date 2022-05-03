@@ -12,7 +12,7 @@
 //!
 //! ## Compatibility
 //!
-//! The `num-integer` crate is tested for rustc 1.8 and greater.
+//! The `num-integer` crate is tested for rustc 1.31 and greater.
 
 #![doc(html_root_url = "https://docs.rs/num-integer/0.1")]
 #![no_std]
