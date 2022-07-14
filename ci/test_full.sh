@@ -3,7 +3,7 @@
 set -e
 
 CRATE=num-integer
-MSRV=1.8
+MSRV=1.31
 
 get_rust_version() {
   local array=($(rustc --version));
@@ -28,7 +28,6 @@ if ! check_version $MSRV ; then
 fi
 
 FEATURES=()
-check_version 1.26 && FEATURES+=(i128)
 echo "Testing supported features: ${FEATURES[*]}"
 
 set -x
