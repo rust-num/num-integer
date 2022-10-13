@@ -335,6 +335,22 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     {
         self.clone() - self.mod_floor(other)
     }
+
+    /// Decrements self.
+    fn dec(&mut self)
+    where
+        Self: Clone,
+    {
+        *self = self.clone() - Self::one()
+    }
+
+    /// Increments self.
+    fn inc(&mut self)
+    where
+        Self: Clone,
+    {
+        *self = self.clone() + Self::one()
+    }
 }
 
 /// Greatest common divisor and Bézout coefficients
