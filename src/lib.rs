@@ -604,11 +604,10 @@ macro_rules! impl_integer_for_isize {
                     let separate_div_rem = (n / d, n % d);
                     let combined_div_rem = n.div_rem(&d);
 
+                    test_division_rule(nd, qr);
+
                     assert_eq!(separate_div_rem, qr);
                     assert_eq!(combined_div_rem, qr);
-
-                    test_division_rule(nd, separate_div_rem);
-                    test_division_rule(nd, combined_div_rem);
                 }
 
                 test_nd_dr((8, 3), (2, 2));
@@ -630,11 +629,10 @@ macro_rules! impl_integer_for_isize {
                         (Integer::div_floor(&n, &d), Integer::mod_floor(&n, &d));
                     let combined_div_mod_floor = Integer::div_mod_floor(&n, &d);
 
+                    test_division_rule(nd, dm);
+
                     assert_eq!(separate_div_mod_floor, dm);
                     assert_eq!(combined_div_mod_floor, dm);
-
-                    test_division_rule(nd, separate_div_mod_floor);
-                    test_division_rule(nd, combined_div_mod_floor);
                 }
 
                 test_nd_dm((8, 3), (2, 2));
