@@ -30,6 +30,13 @@ mod average;
 pub use crate::average::Average;
 pub use crate::average::{average_ceil, average_floor};
 
+mod power10;
+pub use power10::Power10;
+pub use power10::{
+    checked_next_power_of_ten, log10, checked_log10,
+    is_power_of_ten, next_power_of_ten, wrapping_next_power_of_ten,
+};
+
 pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// Floored integer division.
     ///
