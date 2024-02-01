@@ -10,7 +10,7 @@ repository = "https://github.com/rust-num/num-integer"
 name = "num-integer"
 version = "0.1.45"
 readme = "README.md"
-exclude = ["/bors.toml", "/ci/*", "/.github/*"]
+exclude = ["/ci/*", "/.github/*"]
 edition = "2018"
 rust-version = "1.31"
 
