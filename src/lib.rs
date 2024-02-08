@@ -201,7 +201,11 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     }
 
     /// Deprecated, use `is_multiple_of` instead.
-    fn divides(&self, other: &Self) -> bool;
+    #[deprecated(note = "Please use is_multiple_of instead")]
+    #[inline]
+    fn divides(&self, other: &Self) -> bool {
+        self.is_multiple_of(other)
+    }
 
     /// Returns `true` if `self` is a multiple of `other`.
     ///
@@ -557,12 +561,6 @@ macro_rules! impl_integer_for_isize {
                 // should not have to recalculate abs
                 let lcm = (*self * (*other / gcd)).abs();
                 (gcd, lcm)
-            }
-
-            /// Deprecated, use `is_multiple_of` instead.
-            #[inline]
-            fn divides(&self, other: &Self) -> bool {
-                self.is_multiple_of(other)
             }
 
             /// Returns `true` if the number is a multiple of `other`.
@@ -924,12 +922,6 @@ macro_rules! impl_integer_for_usize {
                 let gcd = self.gcd(other);
                 let lcm = *self * (*other / gcd);
                 (gcd, lcm)
-            }
-
-            /// Deprecated, use `is_multiple_of` instead.
-            #[inline]
-            fn divides(&self, other: &Self) -> bool {
-                self.is_multiple_of(other)
             }
 
             /// Returns `true` if the number is a multiple of `other`.
