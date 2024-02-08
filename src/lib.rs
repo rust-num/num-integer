@@ -30,6 +30,9 @@ mod average;
 pub use crate::average::Average;
 pub use crate::average::{average_ceil, average_floor};
 
+mod power;
+pub use power::Power;
+
 pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// Floored integer division.
     ///
