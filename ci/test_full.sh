@@ -30,6 +30,12 @@ fi
 FEATURES=()
 echo "Testing supported features: ${FEATURES[*]}"
 
+cargo generate-lockfile
+
+# num-traits 0.2.19 started using dep: features, which requires 1.60 and is
+# otherwise ignored down to 1.51, but we need a manual downgrade before that.
+check_version 1.51 || cargo update -p num-traits --precise 0.2.18
+
 set -x
 
 # test the default
