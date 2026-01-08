@@ -30,6 +30,9 @@ mod average;
 pub use crate::average::Average;
 pub use crate::average::{average_ceil, average_floor};
 
+mod const_int;
+pub use crate::const_int::{i8, i16, i32, i64, i128}; 
+
 pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// Floored integer division.
     ///
