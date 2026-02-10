@@ -100,6 +100,8 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
 
     /// Greatest Common Divisor (GCD).
     ///
+    /// The result should always be non-negative.
+    ///
     /// # Examples
     ///
     /// ~~~
