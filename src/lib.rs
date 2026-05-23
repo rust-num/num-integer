@@ -122,7 +122,7 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     fn lcm(&self, other: &Self) -> Self;
 
     /// Lowest Common Multiple (LCM) that returns `None`
-	/// if the LCM is too big for the type.
+    /// if the LCM is too big for the type.
     ///
     /// # Examples
     ///
@@ -153,7 +153,7 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
 
     /// Greatest Common Divisor (GCD) and
     /// Lowest Common Multiple (LCM) together, with the LCM returning `None`
-	/// if the LCM is too big for the type.
+    /// if the LCM is too big for the type.
     ///
     /// Potentially more efficient than calling `gcd` and `lcm`
     /// individually for identical inputs.
@@ -617,7 +617,7 @@ macro_rules! impl_integer_for_isize {
 
             /// Calculates the Greatest Common Divisor (GCD) and
             /// Lowest Common Multiple (LCM) of the number and `other`, with
-			/// the LCM returning `None` if the LCM is too big for the type.
+            /// the LCM returning `None` if the LCM is too big for the type.
             #[inline]
             fn checked_gcd_lcm(&self, other: &Self) -> (Self, Option<Self>) {
                 if self.is_zero() && other.is_zero() {
@@ -980,7 +980,7 @@ macro_rules! impl_integer_for_usize {
             }
 
             /// Calculates the Lowest Common Multiple (LCM) of the number and `other`,
-			/// returning `None` if the LCM is too big for the type.
+            /// returning `None` if the LCM is too big for the type.
             #[inline]
             fn checked_lcm(&self, other: &Self) -> Option<Self> {
                 self.checked_gcd_lcm(other).1
@@ -1000,7 +1000,7 @@ macro_rules! impl_integer_for_usize {
 
             /// Calculates the Greatest Common Divisor (GCD) and
             /// Lowest Common Multiple (LCM) of the number and `other`, with the LCM
-			/// returning `None` if the LCM is too big for the type.
+            /// returning `None` if the LCM is too big for the type.
             #[inline]
             fn checked_gcd_lcm(&self, other: &Self) -> (Self, Option<Self>) {
                 if self.is_zero() && other.is_zero() {
