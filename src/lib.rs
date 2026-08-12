@@ -123,6 +123,18 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     /// ~~~
     fn lcm(&self, other: &Self) -> Self;
 
+    /// Lowest Common Multiple (LCM) that returns `None`
+    /// if the LCM is too big for the type.
+    ///
+    /// # Examples
+    ///
+    /// ~~~
+    /// # use num_integer::Integer;
+    /// assert_eq!(7.checked_lcm(&3), Some(21));
+    /// assert_eq!(262144i32.checked_lcm(&262145i32), None);
+    /// ~~~
+    fn checked_lcm(&self, other: &Self) -> Option<Self>;
+
     /// Greatest Common Divisor (GCD) and
     /// Lowest Common Multiple (LCM) together.
     ///
@@ -139,6 +151,25 @@ pub trait Integer: Sized + Num + PartialOrd + Ord + Eq {
     #[inline]
     fn gcd_lcm(&self, other: &Self) -> (Self, Self) {
         (self.gcd(other), self.lcm(other))
+    }
+
+    /// Greatest Common Divisor (GCD) and
+    /// Lowest Common Multiple (LCM) together, with the LCM returning `None`
+    /// if the LCM is too big for the type.
+    ///
+    /// Potentially more efficient than calling `gcd` and `lcm`
+    /// individually for identical inputs.
+    ///
+    /// # Examples
+    ///
+    /// ~~~
+    /// # use num_integer::Integer;
+    /// assert_eq!(10.checked_gcd_lcm(&4), (2, Some(20)));
+    /// assert_eq!(262144i32.checked_gcd_lcm(&262145i32), (1, None));
+    /// ~~~
+    #[inline]
+    fn checked_gcd_lcm(&self, other: &Self) -> (Self, Option<Self>) {
+        (self.gcd(other), self.checked_lcm(other))
     }
 
     /// Greatest common divisor and Bézout coefficients.
@@ -427,12 +458,26 @@ pub fn gcd<T: Integer>(x: T, y: T) -> T {
 pub fn lcm<T: Integer>(x: T, y: T) -> T {
     x.lcm(&y)
 }
+/// Calculates the Lowest Common Multiple (LCM) of the number and `other`,
+/// returning `None` if the LCM is too big for the type.
+#[inline(always)]
+pub fn checked_lcm<T: Integer>(x: T, y: T) -> Option<T> {
+    x.checked_lcm(&y)
+}
 
 /// Calculates the Greatest Common Divisor (GCD) and
 /// Lowest Common Multiple (LCM) of the number and `other`.
 #[inline(always)]
 pub fn gcd_lcm<T: Integer>(x: T, y: T) -> (T, T) {
     x.gcd_lcm(&y)
+}
+
+/// Calculates the Greatest Common Divisor (GCD) and
+/// Lowest Common Multiple (LCM) of the number and `other`, with the LCM
+/// returning `None` if the LCM is too big for the type.
+#[inline(always)]
+pub fn checked_gcd_lcm<T: Integer>(x: T, y: T) -> (T, Option<T>) {
+    x.checked_gcd_lcm(&y)
 }
 
 macro_rules! impl_integer_for_isize {
@@ -552,6 +597,13 @@ macro_rules! impl_integer_for_isize {
                 self.gcd_lcm(other).1
             }
 
+            /// Calculates the Lowest Common Multiple (LCM) of the number and
+            /// `other`, returning `None` if the LCM is too big for the type.
+            #[inline]
+            fn checked_lcm(&self, other: &Self) -> Option<Self> {
+                self.checked_gcd_lcm(other).1
+            }
+
             /// Calculates the Greatest Common Divisor (GCD) and
             /// Lowest Common Multiple (LCM) of the number and `other`.
             #[inline]
@@ -563,6 +615,21 @@ macro_rules! impl_integer_for_isize {
                 // should not have to recalculate abs
                 let lcm = (*self * (*other / gcd)).abs();
                 (gcd, lcm)
+            }
+
+            /// Calculates the Greatest Common Divisor (GCD) and
+            /// Lowest Common Multiple (LCM) of the number and `other`, with
+            /// the LCM returning `None` if the LCM is too big for the type.
+            #[inline]
+            fn checked_gcd_lcm(&self, other: &Self) -> (Self, Option<Self>) {
+                if self.is_zero() && other.is_zero() {
+                    return (Self::zero(), Some(Self::zero()));
+                }
+                let gcd = self.gcd(other);
+                match self.checked_mul(*other / gcd) {
+                    Some(prod) => (gcd, Some(prod.abs())),
+                    None => (gcd, None),
+                }
             }
 
             /// Returns `true` if the number is a multiple of `other`.
@@ -914,6 +981,13 @@ macro_rules! impl_integer_for_usize {
                 self.gcd_lcm(other).1
             }
 
+            /// Calculates the Lowest Common Multiple (LCM) of the number and `other`,
+            /// returning `None` if the LCM is too big for the type.
+            #[inline]
+            fn checked_lcm(&self, other: &Self) -> Option<Self> {
+                self.checked_gcd_lcm(other).1
+            }
+
             /// Calculates the Greatest Common Divisor (GCD) and
             /// Lowest Common Multiple (LCM) of the number and `other`.
             #[inline]
@@ -924,6 +998,21 @@ macro_rules! impl_integer_for_usize {
                 let gcd = self.gcd(other);
                 let lcm = *self * (*other / gcd);
                 (gcd, lcm)
+            }
+
+            /// Calculates the Greatest Common Divisor (GCD) and
+            /// Lowest Common Multiple (LCM) of the number and `other`, with the LCM
+            /// returning `None` if the LCM is too big for the type.
+            #[inline]
+            fn checked_gcd_lcm(&self, other: &Self) -> (Self, Option<Self>) {
+                if self.is_zero() && other.is_zero() {
+                    return (Self::zero(), Some(Self::zero()));
+                }
+                let gcd = self.gcd(other);
+                match self.checked_mul(*other / gcd) {
+                    Some(prod) => (gcd, Some(prod)),
+                    None => (gcd, None),
+                }
             }
 
             /// Returns `true` if the number is a multiple of `other`.
