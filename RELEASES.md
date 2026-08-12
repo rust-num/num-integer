@@ -1,4 +1,4 @@
-# Release 0.1.47 (2025-08-11)
+# Release 0.1.47 (2026-08-11)
 
 - [Implement Karatsuba Square Root for 128-bit `Roots::sqrt`][80]
 - Miscellaneous other improvements to docs and testing.
