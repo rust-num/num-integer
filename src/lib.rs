@@ -571,6 +571,10 @@ macro_rules! impl_integer_for_isize {
                 if other.is_zero() {
                     return self.is_zero();
                 }
+                // Avoid the overflow of `MIN % -1`
+                if *other == -1 {
+                    return true;
+                }
                 *self % *other == 0
             }
 
@@ -833,6 +837,7 @@ macro_rules! impl_integer_for_isize {
                     for one in &[1, -1] {
                         assert_eq!(Integer::next_multiple_of(x, one), *x);
                         assert_eq!(Integer::prev_multiple_of(x, one), *x);
+                        assert!(Integer::is_multiple_of(x, one));
                     }
                 }
             }
