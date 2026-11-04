@@ -1131,6 +1131,8 @@ fn multiply_and_divide<T: Integer + Clone>(r: T, a: T, b: T) -> T {
 
 /// Calculate the binomial coefficient.
 ///
+/// Returns 0 if `k > n` or `k < 0`.
+///
 /// Note that this might overflow, depending on `T`. For the primitive integer
 /// types, the following n are the largest ones possible such that there will
 /// be no overflow for any k:
@@ -1149,7 +1151,7 @@ fn multiply_and_divide<T: Integer + Clone>(r: T, a: T, b: T) -> T {
 /// For larger n, consider using a bigint type for `T`.
 pub fn binomial<T: Integer + Clone>(mut n: T, k: T) -> T {
     // See http://blog.plover.com/math/choose.html for the idea.
-    if k > n {
+    if k > n || k < T::zero() {
         return T::zero();
     }
     if k > n.clone() - k.clone() {
@@ -1169,6 +1171,8 @@ pub fn binomial<T: Integer + Clone>(mut n: T, k: T) -> T {
 }
 
 /// Calculate the multinomial coefficient.
+///
+/// Returns 0 if any entry of `k` is negative.
 pub fn multinomial<T: Integer + Clone>(k: &[T]) -> T
 where
     for<'a> T: Add<&'a T, Output = T>,
@@ -1311,6 +1315,12 @@ fn test_binomial() {
     check!(i64, 14, 4, 1001);
     check!(i64, 0, 0, 1);
     check!(i64, 2, 3, 0);
+
+    assert_eq!(binomial(5i64, -1), 0);
+    assert_eq!(binomial(5i64, -3), 0);
+    assert_eq!(binomial(0i64, -1), 0);
+    assert_eq!(binomial(-3i64, -5), 0);
+    assert_eq!(binomial(-3i64, 1), 0);
 }
 
 #[test]
@@ -1385,4 +1395,9 @@ fn test_multinomial() {
     check_multinomial!(u64, &[], 1);
     check_multinomial!(u64, &[0], 1);
     check_multinomial!(u64, &[12345], 1);
+
+    assert_eq!(multinomial(&[-1i64, 0]), 0);
+    assert_eq!(multinomial(&[0i64, -1]), 0);
+    assert_eq!(multinomial(&[5i64, -3, 2]), 0);
+    assert_eq!(multinomial(&[-3i64, 5, 2]), 0);
 }
